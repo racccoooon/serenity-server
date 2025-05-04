@@ -4,7 +4,9 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "LOG_LEVEL=debug nodemon src/app.js",
+    "dev:info": "LOG_LEVEL=info nodemon src/app.js",
+    "dev:debug": "LOG_LEVEL=debug nodemon src/app.js"
   },
   "keywords": [],
   "author": "",

@@ -1,7 +1,8 @@
 const winston = require('winston');
+const config = require('../config/settings');
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: config.logLevel,
   format: winston.format.combine(
     winston.format.colorize(),
     winston.format.timestamp({
@@ -15,5 +16,8 @@ const logger = winston.createLogger({
     new winston.transports.Console()
   ]
 });
+
+// Log the current level when logger is initialized
+logger.info(`Logger initialized with level: ${logger.level}`);
 
 module.exports = logger;
