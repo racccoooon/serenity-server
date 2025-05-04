@@ -1,7 +1,9 @@
-const fastify = require('fastify')({ logger: false });
-const logger = require('./utils/logger');
-const config = require('./config/settings');
-const routes = require('./routes');
+import Fastify from 'fastify';
+import { logger } from './utils/logger.js';
+import { config } from './config/settings.js';
+import { routes } from './routes/index.js';
+
+const fastify = Fastify({ logger: false });
 
 // Register routes
 fastify.register(routes);

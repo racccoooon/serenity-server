@@ -1,11 +1,9 @@
-const logger = require('../utils/logger');
+import { logger } from '../utils/logger.js';
 
-async function routes(fastify, options) {
+export async function routes(fastify, options) {
   // Health check endpoint
   fastify.get('/api/health', async (request, reply) => {
     logger.debug('Health check requested');
     return { status: 'ok' };
   });
 }
-
-module.exports = routes;

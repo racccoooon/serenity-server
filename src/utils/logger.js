@@ -1,5 +1,5 @@
-const winston = require('winston');
-const config = require('../config/settings');
+import winston from 'winston';
+import { config } from '../config/settings.js';
 
 const logger = winston.createLogger({
   level: config.logLevel,
@@ -20,4 +20,4 @@ const logger = winston.createLogger({
 // Log the current level when logger is initialized
 logger.info(`Logger initialized with level: ${logger.level}`);
 
-module.exports = logger;
+export { logger };
