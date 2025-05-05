@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import { logger } from './utils/logger.js';
 import { config } from './config/settings.js';
 import { routes } from './routes/index.js';
+import {runMigrations} from "./db/index.js";
 
 const fastify = Fastify({ logger: false });
 
@@ -11,6 +12,8 @@ fastify.register(routes);
 // Start the server
 const start = async () => {
   try {
+    await runMigrations();
+
     await fastify.listen(config.server);
     logger.info(`Server is running on http://localhost:${config.server.port}`);
   } catch (err) {
