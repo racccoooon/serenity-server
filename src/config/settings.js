@@ -10,7 +10,7 @@ export const config = {
         password: process.env.POSTGRES_PASSWORD || 'password',
         host: process.env.POSTGRES_HOST || 'localhost',
         port: process.env.POSTGRES_PORT || 7891,
-        database: process.env.POSTGRES_DB || 'postgres'
+        database: process.env.POSTGRES_DB || 'serenity'
     },
     logLevel: process.env.LOG_LEVEL || 'info'
 };
