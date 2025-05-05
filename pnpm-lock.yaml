@@ -17,6 +17,9 @@ importers:
       pg:
         specifier: ^8.15.6
         version: 8.15.6
+      postgres-migrations:
+        specifier: ^5.3.0
+        version: 5.3.0
       winston:
         specifier: ^3.17.0
         version: 3.17.0
@@ -333,6 +336,11 @@ packages:
     resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
     engines: {node: '>=0.10.0'}
 
+  postgres-migrations@5.3.0:
+    resolution: {integrity: sha512-gnTHWJZVWbW8T3mXIxJm1JRU853TqBVWkhgfsTJr7zqT3VexjRmJj9kNi96rVhfTezDU4FVW6pf701kLOZiKIA==}
+    engines: {node: '>10.17.0'}
+    hasBin: true
+
   process-warning@4.0.1:
     resolution: {integrity: sha512-3c2LzQ3rY9d0hc1emcsHhfT9Jwz0cChib/QN89oME2R451w5fy3f0afAhERFZAwrbDU43wk12d0ORBpDVME50Q==}
 
@@ -406,6 +414,10 @@ packages:
   split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
+
+  sql-template-strings@2.2.2:
+    resolution: {integrity: sha512-UXhXR2869FQaD+GMly8jAMCRZ94nU5KcrFetZfWEMd+LVVG6y0ExgHAhatEcKZ/wk8YcKPdi+hiD2wm75lq3/Q==}
+    engines: {node: '>=4.0.0'}
 
   stack-trace@0.0.10:
     resolution: {integrity: sha512-KGzahc7puUKkzyMt+IqAep+TVNbKP+k2Lmwhub39m1AsTSkaDutx56aDCo+HLDzf/D26BIHTJWNiTG1KAJiQCg==}
@@ -788,6 +800,13 @@ snapshots:
     dependencies:
       xtend: 4.0.2
 
+  postgres-migrations@5.3.0:
+    dependencies:
+      pg: 8.15.6
+      sql-template-strings: 2.2.2
+    transitivePeerDependencies:
+      - pg-native
+
   process-warning@4.0.1: {}
 
   process-warning@5.0.0: {}
@@ -843,6 +862,8 @@ snapshots:
       atomic-sleep: 1.0.0
 
   split2@4.2.0: {}
+
+  sql-template-strings@2.2.2: {}
 
   stack-trace@0.0.10: {}
 
