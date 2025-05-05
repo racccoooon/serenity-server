@@ -8,6 +8,8 @@ A Node.js web application server built with modern practices and clean architect
 
 - Node.js >= 22.14.0
 - pnpm >= 10.10.0
+- Podman >= 4.0.0
+- Podman Compose >= 1.0.0
 
 ## Installation
 
@@ -17,19 +19,28 @@ pnpm install
 
 ## Development
 
-Start the development server with auto-reload:
+1. Start the development dependencies (PostgreSQL):
+```bash
+podman-compose up -d
+```
 
+2. Start the development server with auto-reload:
 ```bash
 pnpm dev
 ```
 
 Start with specific log level:
-
 ```bash
 LOG_LEVEL=debug pnpm dev
+```
+
+To stop the development dependencies:
+```bash
+podman-compose down
 ```
 
 ## Scripts
 
 - `pnpm start` - Start the production server
 - `pnpm dev` - Start the development server with auto-reload
+```
