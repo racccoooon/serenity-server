@@ -44,3 +44,13 @@ test('transient has to be a function', () => {
         container.registerTransient(TestInterface, new TestImplementation())
     }).toThrow('Implementation must be a function')
 })
+
+test('transient service is a new instance each time', () => {
+    const container = new Container()
+
+    container.registerTransient(TestInterface, () => new TestImplementation())
+    const resolved1 = container.resolve(TestInterface)
+    const resolved2 = container.resolve(TestInterface)
+
+    expect(resolved1).not.toBe(resolved2)
+})
