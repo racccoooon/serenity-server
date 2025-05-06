@@ -2,7 +2,7 @@
 export class Container {
   #serviceProviders = new Map()
 
-  register(interfaceType, implementation) {
+  registerSingleton(interfaceType, implementation) {
     if (!interfaceType?.prototype) {
       throw new Error('Interface must be a class')
     }

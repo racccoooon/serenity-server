@@ -14,7 +14,7 @@ test('registering non-class interface throws error', () => {
     const container = new Container()
 
     expect(() => {
-        container.register('notAClass', () => {})
+        container.registerSingleton('notAClass', () => {})
     }).toThrow('Interface must be a class')
 })
 
@@ -22,7 +22,7 @@ test('can register and resolve implementation', () => {
     const container = new Container()
     const implementation = new TestImplementation()
 
-    container.register(TestInterface, implementation)
+    container.registerSingleton(TestInterface, implementation)
     const resolved = container.resolve(TestInterface)
 
     expect(resolved).toBe(implementation)
@@ -58,7 +58,7 @@ test('transient service is a new instance each time', () => {
 test('singleton service is the same instance each time', () => {
     const container = new Container()
 
-    container.register(TestInterface, new TestImplementation())
+    container.registerSingleton(TestInterface, new TestImplementation())
     const resolved1 = container.resolve(TestInterface)
     const resolved2 = container.resolve(TestInterface)
 
@@ -69,6 +69,6 @@ test('singleton must not be a function', () => {
     const container = new Container()
 
     expect(() => {
-        container.register(TestInterface, () => new TestImplementation())
+        container.registerSingleton(TestInterface, () => new TestImplementation())
     }).toThrow('Implementation must not be a function')
 })
