@@ -25,6 +25,10 @@ export class Container {
   resolve(interfaceType) {
     const serviceProvider = this.#serviceProviders.get(interfaceType);
 
+    if(!serviceProvider) {
+      throw new Error(`No registration found for ${interfaceType.name}`)
+    }
+
     if(typeof serviceProvider === 'function') {
       return serviceProvider(this);
     }

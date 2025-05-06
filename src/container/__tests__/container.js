@@ -93,3 +93,11 @@ test('resolves passes container into function', () => {
     const resolved = container.resolve(ServiceWithDependency)
     expect(resolved.dependency).toBe(dependency)
 })
+
+test('throws when resolving unregistered service', () => {
+    const container = new Container()
+
+    expect(() => {
+        container.resolve(TestInterface)
+    }).toThrow('No registration found for TestInterface')
+})
