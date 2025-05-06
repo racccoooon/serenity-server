@@ -54,3 +54,13 @@ test('transient service is a new instance each time', () => {
 
     expect(resolved1).not.toBe(resolved2)
 })
+
+test('singleton service is the same instance each time', () => {
+    const container = new Container()
+
+    container.register(TestInterface, new TestImplementation())
+    const resolved1 = container.resolve(TestInterface)
+    const resolved2 = container.resolve(TestInterface)
+
+    expect(resolved1).toBe(resolved2)
+})
