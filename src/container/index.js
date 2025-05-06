@@ -6,6 +6,9 @@ export class Container {
     if (!interfaceType?.prototype) {
       throw new Error('Interface must be a class')
     }
+    if (typeof implementation === 'function') {
+      throw new Error('Implementation must not be a function')
+    }
     this.#serviceProviders.set(interfaceType, implementation)
   }
 

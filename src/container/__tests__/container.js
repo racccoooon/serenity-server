@@ -64,3 +64,11 @@ test('singleton service is the same instance each time', () => {
 
     expect(resolved1).toBe(resolved2)
 })
+
+test('singleton must not be a function', () => {
+    const container = new Container()
+
+    expect(() => {
+        container.register(TestInterface, () => new TestImplementation())
+    }).toThrow('Implementation must not be a function')
+})
