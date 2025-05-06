@@ -19,6 +19,7 @@ export class Mediator {
     if (!handler) {
       throw new Error(`No handler registered for ${command.constructor.name}`)
     }
-  }
 
+    return await handler(command)
+  }
 }
