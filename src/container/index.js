@@ -1,15 +1,28 @@
 // src/container/container.js
 export class Container {
-  #services = new Map()
+  #serviceProviders = new Map()
 
   register(interfaceType, implementation) {
     if (!interfaceType?.prototype) {
       throw new Error('Interface must be a class')
     }
-    this.#services.set(interfaceType, implementation)
+    this.#serviceProviders.set(interfaceType, implementation)
+  }
+
+  registerTransient(interfaceType, implementation) {
+    if (!interfaceType?.prototype) {
+      throw new Error('Interface must be a class')
+    }
+    this.#serviceProviders.set(interfaceType, implementation)
   }
 
   resolve(interfaceType) {
-    return this.#services.get(interfaceType)
+    const serviceProvider = this.#serviceProviders.get(interfaceType);
+
+    if(typeof serviceProvider === 'function') {
+      return serviceProvider();
+    }
+
+    return serviceProvider;
   }
 }

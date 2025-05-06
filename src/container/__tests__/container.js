@@ -27,3 +27,12 @@ test('can register and resolve implementation', () => {
 
     expect(resolved).toBe(implementation)
 })
+
+test('can register and resolve transient implementation', () => {
+    const container = new Container()
+
+    container.registerTransient(TestInterface, () => new TestImplementation())
+    const resolved = container.resolve(TestInterface)
+
+    expect(resolved).toBeInstanceOf(TestImplementation)
+})
