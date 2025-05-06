@@ -26,7 +26,7 @@ export class Container {
     const serviceProvider = this.#serviceProviders.get(interfaceType);
 
     if(typeof serviceProvider === 'function') {
-      return serviceProvider();
+      return serviceProvider(this);
     }
 
     return serviceProvider;

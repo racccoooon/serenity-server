@@ -72,3 +72,24 @@ test('singleton must not be a function', () => {
         container.registerSingleton(TestInterface, () => new TestImplementation())
     }).toThrow('Implementation must not be a function')
 })
+
+class ServiceWithDependency {
+    constructor(dependency) {
+        this.dependency = dependency
+    }
+}
+
+test('resolves passes container into function', () => {
+    const container = new Container()
+    const dependency = new TestImplementation()
+
+    container.registerSingleton(TestInterface, dependency)
+
+    container.registerTransient(ServiceWithDependency, (c) => {
+        const dependency = c.resolve(TestInterface)
+        return new ServiceWithDependency(dependency)
+    })
+
+    const resolved = container.resolve(ServiceWithDependency)
+    expect(resolved.dependency).toBe(dependency)
+})
