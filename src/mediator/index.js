@@ -13,4 +13,12 @@ export class Mediator {
 
     this.#handlers.set(commandType, handler)
   }
+
+  async send(command) {
+    const handler = this.#handlers.get(command.constructor)
+    if (!handler) {
+      throw new Error(`No handler registered for ${command.constructor.name}`)
+    }
+  }
+
 }
