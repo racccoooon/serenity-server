@@ -1,0 +1,17 @@
+### Register
+POST http://localhost:5680/api/v1/users/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "Bean27",
+  "email": "bean@karo.gay",
+  "authenticationMethods": [
+    {
+      "type": "password",
+      "details": {
+        "password": "secretbean!"
+      }
+    }
+  ]
+}
