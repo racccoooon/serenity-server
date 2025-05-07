@@ -12,7 +12,6 @@ export class Mediator {
     }
 
     const temp = handlerFactory();
-    console.log(temp)
     if(!(temp instanceof Object)) {
       throw new Error('Handler factory must return an object')
     }
