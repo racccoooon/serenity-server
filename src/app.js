@@ -4,11 +4,15 @@ import {config} from './config/settings.js';
 import {routes} from './routes/index.js';
 import {runMigrations} from "./db/index.js";
 import {initializeMediator} from './mediator/instance.js'
+import {serializerCompiler, validatorCompiler} from "fastify-zod-openapi";
 
 const fastify = Fastify({logger: false});
 
 // Register routes
 fastify.register(routes);
+
+fastify.setValidatorCompiler(validatorCompiler);
+fastify.setSerializerCompiler(serializerCompiler);
 
 // Start the server
 const start = async () => {
