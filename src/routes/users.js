@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { extendZodWithOpenApi } from 'zod-openapi';
 import {RegisterUserCommand} from "../commands/users/registerUser.js";
 import {mediator} from "../app.js";
+import {status} from "http-status";
 
 extendZodWithOpenApi(z);
 
@@ -30,11 +31,11 @@ export async function registerUser(fastify) {
     }, async (request, reply) => {
         const requestDto = request.body;
 
-        await mediator.send(new RegisterUserCommand(requestDto.username, requestDto.email, requestDto.authenticationMethods));
+        await mediator.send(new RegisterUserCommand(
+            requestDto.username,
+            requestDto.email,
+            requestDto.authenticationMethods));
 
-        reply.code(200).send({
-          error: 'Internal Server Error Cheese',
-          message: 'Error registering user'
-        });
+        reply.code(status.NO_CONTENT);
     });
 }
