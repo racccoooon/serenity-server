@@ -18,18 +18,23 @@ export function createUserRequestModel(user)
 
 /**
  * Maps a User domain model to CreateUserModel
- * @param {import('../domain/auth.js').PasswordAuthentication} data
+ * @param {import('../domain/user.js').AuthenticationMethod} method
  * @returns {CreatePasswordModel}
  */
-export function createPasswordRequestModel(data)
+export function createPasswordRequestModel(userId, method)
 {
+    if (method.type !== AuthType.PASSWORD) {
+        throw new Error('Invalid authentication type, expected type password');
+    }
+
+    const data = method.getData(AuthType.PASSWORD)
+
     const model = new CreatePasswordModel();
-    model.id = data.id;
-    model.hash = data.passwordHash;
+    model.id = method.id;
+    model.userId = userId;
+    model.details = data;
     return model;
 }
-
-
 
 export class UserDomainService {
     /**
@@ -57,11 +62,7 @@ export class UserDomainService {
         for (const authenticationMethod of user.authenticationMethods) {
             switch (authenticationMethod.type) {
                 case AuthType.PASSWORD:
-                    const data = authenticationMethod.getData(AuthType.PASSWORD);
-                    await this.userAuthRepository.addPassword({
-                        id: authenticationMethod.id,
-                        hash: data.passwordHash,
-                    });
+                    await this.userAuthRepository.addPassword(createPasswordRequestModel(user.id, authenticationMethod));
             }
         }
     }
