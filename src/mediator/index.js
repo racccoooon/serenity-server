@@ -2,24 +2,37 @@
 export class Mediator {
   #handlers = new Map()
 
-  register(commandType, handler) {
+  register(commandType, handlerFactory) {
     if (!commandType?.prototype) {
       throw new Error('Command type must be a class')
     }
 
-    if (typeof handler !== 'function') {
-      throw new Error('Handler must be a function')
+    if (typeof handlerFactory !== 'function') {
+      throw new Error('Handler factory must be a function')
     }
 
-    this.#handlers.set(commandType, handler)
+    const temp = handlerFactory();
+    console.log(temp)
+    if(!(temp instanceof Object)) {
+      throw new Error('Handler factory must return an object')
+    }
+
+    const handleFunc = temp.handle;
+    if(typeof handleFunc !== 'function') {
+      throw new Error('Handler factory must return a class with a handle function')
+    }
+
+    this.#handlers.set(commandType, handlerFactory)
   }
 
   async send(command) {
-    const handler = this.#handlers.get(command.constructor)
-    if (!handler) {
-      throw new Error(`No handler registered for ${command.constructor.name}`)
+    const handlerFactory = this.#handlers.get(command.constructor)
+    if (!handlerFactory) {
+      throw new Error(`No handler factory registered for ${command.constructor.name}`)
     }
 
-    return await handler(command)
+    const handler = handlerFactory();
+
+    return await handler.handle(command)
   }
 }
