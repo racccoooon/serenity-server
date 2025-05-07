@@ -9,7 +9,7 @@ import {UserDomainService} from "./services/userDomainService.js";
 import {UserRepository} from "./repositories/userRepository.js";
 import {UserAuthRepository} from "./repositories/userAuthRepository.js";
 import {Mediator} from "./mediator/index.js";
-import {handleRegisterUser, RegisterUserCommand} from "./commands/users/registerUser.js";
+import {handleRegisterUser, RegisterUserCommand, RegisterUserHandler} from "./commands/users/registerUser.js";
 
 const fastify = Fastify({logger: false});
 
@@ -29,9 +29,13 @@ container.registerTransient(UserDomainService, (c) => new UserDomainService({
 container.registerTransient(UserRepository, () => new UserRepository());
 container.registerTransient(UserAuthRepository, () => new UserAuthRepository());
 
+container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
+    c.resolve(UserDomainService),
+));
+
 export const mediator = new Mediator();
 
-mediator.register(RegisterUserCommand, handleRegisterUser);
+mediator.register(RegisterUserCommand, () => container.resolve(RegisterUserHandler));
 
 // Start the server
 const start = async () => {
