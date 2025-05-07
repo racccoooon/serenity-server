@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from 'zod-openapi';
+import {RegisterUserCommand} from "../commands/users/registerUser.js";
+import {mediator} from "../app.js";
 
 extendZodWithOpenApi(z);
 
@@ -26,6 +28,9 @@ export async function registerUser(fastify) {
             body: userRegisterSchema,
         },
     }, async (request, reply) => {
+        const requestDto = request.body;
+
+        await mediator.send(new RegisterUserCommand(requestDto.username, requestDto.email, requestDto.authenticationMethods));
 
         reply.code(200).send({
           error: 'Internal Server Error Cheese',
