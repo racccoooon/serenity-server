@@ -7,7 +7,8 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "dev:info": "LOG_LEVEL=info nodemon src/app.js",
-    "dev:debug": "LOG_LEVEL=debug nodemon src/app.js"
+    "dev:debug": "LOG_LEVEL=debug nodemon src/app.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],
   "author": "",
@@ -19,13 +20,20 @@
   },
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.10"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.5.0",
     "fastify": "^5.3.2",
+    "fastify-zod-openapi": "^4.1.2",
+    "http-status": "^2.1.0",
     "pg": "^8.15.6",
     "postgres-migrations": "^5.3.0",
-    "winston": "^3.17.0"
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0",
+    "zod": "^3.24.4",
+    "zod-openapi": "^4.2.4"
   }
 }

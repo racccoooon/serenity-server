@@ -43,4 +43,7 @@ podman-compose down
 
 - `pnpm start` - Start the production server
 - `pnpm dev` - Start the development server with auto-reload
+- `pnpm test` - Run all tests
+- `pnpm test --watch` - Run tests in watch mode, automatically re-running tests on file changes
+
 ```
