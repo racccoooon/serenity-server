@@ -17,6 +17,9 @@ importers:
       fastify:
         specifier: ^5.3.2
         version: 5.3.2
+      fastify-zod-openapi:
+        specifier: ^4.1.2
+        version: 4.1.2(fastify@5.3.2)(zod-openapi@4.2.4(zod@3.24.4))(zod@3.24.4)
       pg:
         specifier: ^8.15.6
         version: 8.15.6
@@ -29,6 +32,12 @@ importers:
       winston:
         specifier: ^3.17.0
         version: 3.17.0
+      zod:
+        specifier: ^3.24.4
+        version: 3.24.4
+      zod-openapi:
+        specifier: ^4.2.4
+        version: 4.2.4(zod@3.24.4)
     devDependencies:
       jest:
         specifier: ^29.7.0
@@ -692,6 +701,24 @@ packages:
 
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
+
+  fastify-plugin@5.0.1:
+    resolution: {integrity: sha512-HCxs+YnRaWzCl+cWRYFnHmeRFyR5GVnJTAaCJQiYzQSDwK9MgJdyAsuL3nh0EWRCYMgQ5MeziymvmAhUHYHDUQ==}
+
+  fastify-zod-openapi@4.1.2:
+    resolution: {integrity: sha512-7dcrgMqu862tL5WoSxgZAuxsx4ce0cBTdG9pOGEOc58k7Ti9Cub0xNbzy+o3S8vZFmq4nSqFrDTFSxXwLLJ16A==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@fastify/swagger': ^9.0.0
+      '@fastify/swagger-ui': ^5.0.1
+      fastify: '5'
+      zod: ^3.21.4
+      zod-openapi: ^4.2.0
+    peerDependenciesMeta:
+      '@fastify/swagger':
+        optional: true
+      '@fastify/swagger-ui':
+        optional: true
 
   fastify@5.3.2:
     resolution: {integrity: sha512-AIPqBgtqBAwkOkrnwesEE+dOyU30dQ4kh7udxeGVR05CRGwubZx+p2H8P0C4cRnQT0+EPK4VGea2DTL2RtWttg==}
@@ -1621,6 +1648,15 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod-openapi@4.2.4:
+    resolution: {integrity: sha512-tsrQpbpqFCXqVXUzi3TPwFhuMtLN3oNZobOtYnK6/5VkXsNdnIgyNr4r8no4wmYluaxzN3F7iS+8xCW8BmMQ8g==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.21.4
+
+  zod@3.24.4:
+    resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -2441,6 +2477,17 @@ snapshots:
   fast-redact@3.5.0: {}
 
   fast-uri@3.0.6: {}
+
+  fastify-plugin@5.0.1: {}
+
+  fastify-zod-openapi@4.1.2(fastify@5.3.2)(zod-openapi@4.2.4(zod@3.24.4))(zod@3.24.4):
+    dependencies:
+      '@fastify/error': 4.1.0
+      fast-json-stringify: 6.0.1
+      fastify: 5.3.2
+      fastify-plugin: 5.0.1
+      zod: 3.24.4
+      zod-openapi: 4.2.4(zod@3.24.4)
 
   fastify@5.3.2:
     dependencies:
@@ -3505,3 +3552,9 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
+
+  zod-openapi@4.2.4(zod@3.24.4):
+    dependencies:
+      zod: 3.24.4
+
+  zod@3.24.4: {}
