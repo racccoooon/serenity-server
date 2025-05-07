@@ -3,19 +3,19 @@ import { jest } from '@jest/globals';
 import {PasswordAuthentication} from "../../domain/auth.js";
 import {User} from "../../domain/user.js";
 
-test('register user without command', async () => {
+test('Register user without command', async () => {
     const handler = new RegisterUserHandler();
     expect(handler.handle()).rejects.toThrow('Command must be provided');
 });
 
-test('register user without authentication method', async () => {
+test('Register user without authentication method', async () => {
     const command = {authenticationMethods: []};
     const handler = new RegisterUserHandler({});
     expect(handler.handle(command, {})).rejects.toThrow('Missing authentication method');
 });
 
 
-test('register user without authentication method', async () => {
+test('Register user', async () => {
     // arrange
     const command = {
         username: '<USER>',
