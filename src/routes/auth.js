@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from 'zod-openapi';
-import {RegisterUserCommand} from "../commands/users/registerUser.js";
+import {RegisterUserCommand} from "../commands/auth/registerUser.js";
 import {mediator} from "../app.js";
 import {status} from "http-status";
 

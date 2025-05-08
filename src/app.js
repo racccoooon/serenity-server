@@ -9,7 +9,7 @@ import {UserDomainService} from "./services/userDomainService.js";
 import {UserRepository} from "./repositories/userRepository.js";
 import {UserAuthRepository} from "./repositories/userAuthRepository.js";
 import {Mediator} from "./mediator/index.js";
-import {RegisterUserCommand, RegisterUserHandler} from "./commands/users/registerUser.js";
+import {RegisterUserCommand, RegisterUserHandler} from "./commands/auth/registerUser.js";
 
 const fastify = Fastify({logger: false});
 

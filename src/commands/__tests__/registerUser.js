@@ -1,4 +1,4 @@
-import {RegisterUserHandler} from "../users/registerUser.js";
+import {RegisterUserHandler} from "../auth/registerUser.js";
 import { jest } from '@jest/globals';
 import {PasswordAuthentication} from "../../domain/auth.js";
 import {User} from "../../domain/user.js";
