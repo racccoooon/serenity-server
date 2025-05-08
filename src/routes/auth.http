@@ -1,5 +1,5 @@
 ### Register
-POST http://localhost:5680/api/v1/users/register
+POST http://localhost:5680/api/v1/auth/register
 Content-Type: application/json
 Accept: application/json
 

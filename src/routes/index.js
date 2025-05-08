@@ -1,5 +1,5 @@
 import { logger } from '../utils/logger.js';
-import { registerUser } from './users.js';
+import { registerUser } from './auth.js';
 
 export async function routes(fastify, options) {
   fastify.get('/api/health', async (request, reply) => {
