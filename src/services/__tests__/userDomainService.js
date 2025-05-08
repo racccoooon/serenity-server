@@ -39,13 +39,40 @@ test('create user requires at least one auth method', async () => {
     await expect(sut.createUser(user)).rejects.toThrow('User must have at least one authentication method');
 })
 
+test('find user with wrong or missing parameter', async () => {
+    const sut = new UserDomainService({userRepository: null, userAuthRepository: null});
+    await expect(sut.findUser()).rejects.toThrow('selector must be provided');
+    await expect(sut.findUser(null)).rejects.toThrow('selector must be provided');
+    await expect(sut.findUser(2)).rejects.toThrow('selector must be a UserSelector');
+});
+
 test('find nonexisting user', async () => {
     // arrange
-    const sut = new UserDomainService({userRepository: null, userAuthRepository: null});
+    const userRepository = {
+        find: jest.fn(() => null),
+    };
+    const sut = new UserDomainService({userRepository, userAuthRepository: null});
 
     // act
     const user = await sut.findUser(UserSelector.from("unknown-user"));
 
     // act
     expect(user).toBe(null);
+});
+
+test('find existing user', async () => {
+    // arrange
+    const userRepository = {
+        find: jest.fn(() => ({
+            username: "LittleBean",
+            email: "bean@karo.gay",
+        })),
+    };
+    const sut = new UserDomainService({userRepository, userAuthRepository: null});
+
+    // act
+    const user = await sut.findUser(UserSelector.from("<UserName>"));
+
+    // act
+    expect(user).toStrictEqual(new User(new UserName("LittleBean"), "bean@karo.gay"));
 });

@@ -1,6 +1,7 @@
 import {AuthType} from "../domain/auth.js";
 import {CreateUserModel} from "../repositories/userRepository.js";
 import {CreatePasswordModel} from "../repositories/userAuthRepository.js";
+import {User, UserName, UserSelector} from "../domain/user.js";
 
 /**
  * Maps a User domain model to CreateUserModel
@@ -54,7 +55,7 @@ export class UserDomainService {
      * @param {import('../domain/user').User} user
      * @returns {Promise<void>}
      */
-    createUser = async (user) => {
+    async createUser (user) {
         if (user.authenticationMethods.length === 0) {
             throw new Error('User must have at least one authentication method');
         }
@@ -70,10 +71,20 @@ export class UserDomainService {
 
     /**
      * @param {import('../domain/user').UserSelector} selector
-     * @returns {Promise<import('../domain/user').User>|null}
+     * @returns {Promise<import('../domain/user').User|null>}
      */
-    findUser = async (selector) => {
-        return null;
+    async findUser(selector) {
+        if (!selector) throw new Error('selector must be provided');
+        if (!(selector instanceof UserSelector)) throw new Error('selector must be a UserSelector');
+
+        const userModel = await this.userRepository.find(selector);
+        if(!userModel) {
+            return null;
+        }
+
+        return new User(
+            new UserName(userModel.username),
+            userModel.email);
     }
 }
 
