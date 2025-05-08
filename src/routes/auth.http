@@ -15,3 +15,13 @@ Accept: application/json
     }
   ]
 }
+
+### Login
+POST http://localhost:5680/api/v1/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "Bean27",
+  "password": "secretbean!"
+}
