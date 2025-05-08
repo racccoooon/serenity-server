@@ -1,7 +1,15 @@
+import {SessionToken} from "../../domain/session.js";
+
 export class PasswordLoginCommand {
     constructor(userSelector, password) {
         this.userSelector = userSelector;
         this.password = password;
+    }
+}
+
+export class LoginResponse {
+    constructor(sessionToken) {
+        this.sessionToken = sessionToken;
     }
 }
 
@@ -24,8 +32,11 @@ export class PasswordLoginHandler {
             throw new AuthorizationError();
         }
 
-        if (this.authDomainService.tryPasswordLogin(user, command.password) !== true){
+        let sessionToken = this.authDomainService.tryPasswordLogin(user, command.password);
+        if (!sessionToken) {
             throw new AuthorizationError();
         }
+
+        return new LoginResponse(sessionToken);
     }
 }

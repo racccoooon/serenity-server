@@ -43,3 +43,27 @@ test('Login wrong password', async () => {
     // act
     expect(handler.handle(command)).rejects.toThrow(AuthorizationError)
 });
+
+test('Login correct user and password', async () => {
+    // arrange
+    const userService = {
+        findUser: jest.fn(() => ({})),
+    };
+
+    const authService = {
+        tryPasswordLogin: jest.fn(() => "session"),
+    };
+
+    const command = {
+        username: "UnknownBean",
+        password: "<Password>",
+    };
+
+    const handler = new PasswordLoginHandler(userService, authService);
+
+    // act
+    const response = await handler.handle(command);
+
+    // assert
+    expect(response.sessionToken).toStrictEqual("session");
+});
