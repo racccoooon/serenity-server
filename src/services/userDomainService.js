@@ -10,14 +10,15 @@ import {CreatePasswordModel} from "../repositories/userAuthRepository.js";
 export function createUserRequestModel(user)
 {
     const model = new CreateUserModel();
-    model.id = user.id;
-    model.username = user.username;
+    model.id = user.id.value;
+    model.username = user.username.value;
     model.email = user.email;
     return model;
 }
 
 /**
  * Maps a User domain model to CreateUserModel
+ * @param {import('../domain/user.js').UserId} userId
  * @param {import('../domain/user.js').AuthenticationMethod} method
  * @returns {CreatePasswordModel}
  */
@@ -31,7 +32,7 @@ export function createPasswordRequestModel(userId, method)
 
     const model = new CreatePasswordModel();
     model.id = method.id;
-    model.userId = userId;
+    model.userId = userId.value;
     model.details = data;
     return model;
 }
