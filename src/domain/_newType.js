@@ -1,8 +1,10 @@
 export class NewType {
+    #value;
+
     constructor(value) {
         // Call the subclass-defined validation logic
         this.validate(value);
-        this._value = value;
+        this.#value = value;
     }
 
     validate(_) {
@@ -10,10 +12,10 @@ export class NewType {
     }
 
     get value() {
-        return this._value;
+        return this.#value;
     }
 
     toString() {
-        return String(this._value);
+        return String(this.#value);
     }
 }
