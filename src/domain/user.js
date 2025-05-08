@@ -1,31 +1,28 @@
 import {v4} from 'uuid';
 import {NewType} from "./_newType.js";
+import {Union} from "./_union.js";
+import {z} from "zod";
+
+export const userNameSchema = z.string({
+    message: "UserName must be a string."
+}).trim().nonempty("UserName cannot be empty.").max(63, "UserName must be at most 63 characters long.")
 
 export class UserName extends NewType {
     validate(value) {
-        if (typeof value !== 'string') {
-            throw new Error("UserName must be a string.");
-        }
-
-        const trimmed = value.trim();
-
-        if (trimmed.length === 0) {
-            throw new Error("UserName cannot be empty.");
-        }
-
-        if (trimmed.length > 63) {
-            throw new Error("UserName must be at most 63 characters long.");
-        }
+        userNameSchema.parse(value)
     }
 }
+
+export const userIdSchema = z.string().uuid()
 
 export class UserId extends NewType {
     validate(value) {
-        if (typeof value !== 'string' || !validateUUID(value)) {
-            throw new Error("UserId must be a valid UUID string.");
-        }
+        userIdSchema.parse(value)
     }
 }
+
+export class UserSelector extends Union(UserId, UserName) {}
+
 
 export class User {
     /** @type {UserId} */
