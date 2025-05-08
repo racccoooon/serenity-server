@@ -67,5 +67,13 @@ export class UserDomainService {
             }
         }
     }
+
+    /**
+     * @param {import('../domain/user').UserSelector} selector
+     * @returns {Promise<import('../domain/user').User>|null}
+     */
+    findUser = async (selector) => {
+        return null;
+    }
 }
 

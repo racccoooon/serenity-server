@@ -1,5 +1,5 @@
 import {UserDomainService, createUserRequestModel, createPasswordRequestModel} from '../userDomainService';
-import {User, UserName} from "../../domain/user.js";
+import {User, UserName, UserSelector} from "../../domain/user.js";
 import {PasswordAuthentication} from "../../domain/auth.js";
 import { jest } from '@jest/globals';
 
@@ -40,5 +40,12 @@ test('create user requires at least one auth method', async () => {
 })
 
 test('find nonexisting user', async () => {
+    // arrange
+    const sut = new UserDomainService({userRepository: null, userAuthRepository: null});
 
+    // act
+    const user = await sut.findUser(UserSelector.from("unknown-user"));
+
+    // act
+    expect(user).toBe(null);
 });
