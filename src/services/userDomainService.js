@@ -1,7 +1,7 @@
-import {AuthType} from "../domain/auth.js";
+import {AuthType, PasswordAuthentication} from "../domain/auth.js";
 import {CreateUserModel} from "../repositories/userRepository.js";
 import {CreatePasswordModel} from "../repositories/userAuthRepository.js";
-import {User, UserName, UserSelector} from "../domain/user.js";
+import {User, UserId, UserName, UserSelector} from "../domain/user.js";
 
 /**
  * Maps a User domain model to CreateUserModel
@@ -82,9 +82,21 @@ export class UserDomainService {
             return null;
         }
 
-        return new User(
+        const user = new User(
             new UserName(userModel.username),
-            userModel.email);
+            userModel.email,
+            new UserId(userModel.id));
+
+        const authMethods = await this.userAuthRepository.byUserId(userModel.id);
+        for (let authMethod of authMethods) {
+            switch (authMethod.type) {
+                case 'password':
+                    user.withAuthentication(PasswordAuthentication.fromHash(authMethod.details.hash));
+                    break;
+            }
+        }
+
+        return user;
     }
 }
 

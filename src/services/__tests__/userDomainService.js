@@ -1,5 +1,5 @@
 import {UserDomainService, createUserRequestModel, createPasswordRequestModel} from '../userDomainService';
-import {User, UserName, UserSelector} from "../../domain/user.js";
+import {User, UserId, UserName, UserSelector} from "../../domain/user.js";
 import {PasswordAuthentication} from "../../domain/auth.js";
 import { jest } from '@jest/globals';
 
@@ -64,15 +64,27 @@ test('find existing user', async () => {
     // arrange
     const userRepository = {
         find: jest.fn(() => ({
+            id: "76f69c5f-3884-47c4-94d7-dff8f44270cf",
             username: "LittleBean",
             email: "bean@karo.gay",
         })),
     };
-    const sut = new UserDomainService({userRepository, userAuthRepository: null});
+    const userAuthRepository = {
+        byUserId: jest.fn(id => [
+            {
+                type: 'password',
+                details: {
+                    hash: 'foobar',
+                },
+            },
+        ])
+    };
+    const sut = new UserDomainService({userRepository, userAuthRepository});
 
     // act
     const user = await sut.findUser(UserSelector.from("<UserName>"));
 
     // act
-    expect(user).toStrictEqual(new User(new UserName("LittleBean"), "bean@karo.gay"));
+    expect(user).toEqual(new User(new UserName("LittleBean"), "bean@karo.gay", new UserId("76f69c5f-3884-47c4-94d7-dff8f44270cf"))
+        .withAuthentication(PasswordAuthentication.fromHash("<Hash>")));
 });

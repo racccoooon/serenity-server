@@ -40,15 +40,19 @@ export class User {
      * @param {UserName} username
      * @param {string} email
      */
-    constructor(username, email) {
-        if (!(username instanceof UserName)) {
-            throw new Error('Username must be a UserName');
-        }
-        if (typeof email !== 'string') {
-            throw new Error('Email must be a string');
-        }
+    constructor(username, email, id = null) {
+        if (!(username instanceof UserName)) throw new Error('Username must be a UserName');
+        if (typeof email !== 'string') throw new Error('Email must be a string');
 
-        this.#id = new UserId(v4());
+        if(id)
+        {
+            if(!(id instanceof UserId)) throw new Error('Id must be a UserId');
+            this.#id = id;
+        }
+        else
+        {
+            this.#id = new UserId(v4());
+        }
 
         this.#username = username;
         this.#email = email;
