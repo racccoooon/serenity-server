@@ -14,9 +14,31 @@ test('Login unknown user', async () => {
 
     const command = {
         username: "UnknownBean",
+        password: "<Password>",
     };
 
     const handler = new PasswordLoginHandler(userService);
+
+    // act
+    expect(handler.handle(command)).rejects.toThrow(AuthorizationError)
+});
+
+test('Login wrong password', async () => {
+    // arrange
+    const userService = {
+        findUser: jest.fn(() => ({})),
+    };
+
+    const authService = {
+        tryPasswordLogin: jest.fn(() => false),
+    };
+
+    const command = {
+        username: "UnknownBean",
+        password: "<Password>",
+    };
+
+    const handler = new PasswordLoginHandler(userService, authService);
 
     // act
     expect(handler.handle(command)).rejects.toThrow(AuthorizationError)
