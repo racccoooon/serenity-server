@@ -1,4 +1,5 @@
 import {AuthorizationError} from "../errors/authorizationError.js";
+import {logger} from "../utils/logger.js";
 
 export default function errorHandler(error, request, reply) {
     if (error instanceof AuthorizationError) {
@@ -10,8 +11,6 @@ export default function errorHandler(error, request, reply) {
         const issues = [];
         for (let validationElement of error.validation) {
             const issue = validationElement.params.issue;
-            console.log("###############################")
-            console.log(issue)
             issues.push(issue);
         }
         return reply.code(400).send({ error: "Bad Request", issues});

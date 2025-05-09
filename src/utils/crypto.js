@@ -4,9 +4,13 @@ import path from 'path';
 import { config } from "../config/settings.js";
 import { logger } from "./logger.js";
 
-// These will hold the key objects
-export let PRIVATE_KEY = null;
-export let PUBLIC_KEY = null;
+// These will hold the key objects and are initialized with statically set dummies for testing
+export let PRIVATE_KEY = createPrivateKey(`-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIOcTzODJbMD/q9nphF6D5EuIlKa9lTKJ9+kURmAr0sWl
+-----END PRIVATE KEY-----`);
+export let PUBLIC_KEY = createPublicKey(`-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAFsbHLd0pSCn+nAlWOhGbAeD2EalBJgM1ERuv+kHovHc=
+-----END PUBLIC KEY-----`);
 
 export async function loadKeyPair() {
     const privateExists = await fs.stat(config.keyPair.privateKeyPath).then(() => true).catch(() => false);

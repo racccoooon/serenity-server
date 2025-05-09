@@ -9,6 +9,7 @@ import {stringify} from "uuid";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
 import {getHttpAuthStrategy} from "./_httpAuth.js";
+import {CreatePublicTokenCommand} from "../commands/auth/createPublicToken.js";
 
 extendZodWithOpenApi(z);
 
@@ -82,8 +83,14 @@ export async function makePublicToken(fastify) {
         const entity = await getHttpAuthStrategy(request.headers);
         if(!entity.isLocalUser()) throw new AuthorizationError();
 
+        const requestDto = request.body;
 
+        const response = await mediator.send(new CreatePublicTokenCommand(
+            entity.id,
+            requestDto.publicKey));
 
-        reply.code(status.NO_CONTENT);
+        reply.code(status.OK).send({
+            jwt: response.jwt,
+        });
     });
 }

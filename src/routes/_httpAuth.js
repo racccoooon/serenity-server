@@ -2,6 +2,7 @@ import {AuthorizationError} from "../errors/authorizationError.js";
 import {container} from "../app.js";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
+import {UserId} from "../domain/user.js";
 
 export class AuthenticatedEntity {
     constructor(type, id) {
@@ -11,6 +12,10 @@ export class AuthenticatedEntity {
 
     isLocalUser() {
         return this.type === 'local_user';
+    }
+
+    isRemoteUser() {
+        return this.type === 'remote_user';
     }
 }
 
@@ -49,7 +54,13 @@ export async function getHttpAuthStrategy(headers){
             throw new AuthorizationError();
         }
 
-        return new AuthenticatedEntity('local_user', dbSession.userId);
+        return new AuthenticatedEntity('local_user', new UserId(dbSession.userId));
+    }
+
+    const signature = headers['x-signature'];
+    const certificate = headers['x-certificate'];
+    if(signature && certificate){
+        //TODO: implement remote authentication + block list check
     }
 
     throw new AuthorizationError();

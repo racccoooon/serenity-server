@@ -4,7 +4,7 @@ export const config = {
     server: {
         port: process.env.PORT || 5680,
         host: process.env.HOST || '0.0.0.0',
-        domain: process.env.DOMAIN || 'localhost',
+        domain: process.env.DOMAIN || 'localhost:5680',
     },
     db: {
         user: process.env.POSTGRES_USER || 'user',

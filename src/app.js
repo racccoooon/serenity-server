@@ -18,6 +18,7 @@ import {CreateServerCommand, CreateServerHandler} from "./commands/server/create
 import {ServerDomainService} from "./services/serverDomainService.js";
 import {ServerRepository} from "./repositories/serverRepository.js";
 import {loadKeyPair} from "./utils/crypto.js";
+import {CreatePublicTokenCommand, CreatePublicTokenHandler} from "./commands/auth/createPublicToken.js";
 
 const fastify = Fastify({logger: false});
 
@@ -53,6 +54,9 @@ container.registerTransient(PasswordLoginHandler, (c) => new PasswordLoginHandle
     c.resolve(UserDomainService),
     c.resolve(AuthDomainService),
 ));
+container.registerTransient(CreatePublicTokenHandler, (c) => new CreatePublicTokenHandler(
+    c.resolve(UserDomainService),
+));
 
 container.registerTransient(CreateServerHandler, (c) => new CreateServerHandler(
     c.resolve(ServerDomainService),
@@ -62,6 +66,7 @@ export const mediator = new Mediator();
 
 mediator.register(RegisterUserCommand, () => container.resolve(RegisterUserHandler));
 mediator.register(PasswordLoginCommand, () => container.resolve(PasswordLoginHandler));
+mediator.register(CreatePublicTokenCommand, () => container.resolve(CreatePublicTokenHandler));
 
 mediator.register(CreateServerCommand, () => container.resolve(CreateServerHandler));
 
