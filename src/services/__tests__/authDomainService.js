@@ -13,7 +13,7 @@ test('user without password', async () => {
     expect(sessionToken).toBe(null);
 });
 
-test('user with different password', async () => {
+test('user with wrong password', async () => {
     const user = {
         authenticationMethods: [
             await PasswordAuthentication.fromPlain("bar"),
