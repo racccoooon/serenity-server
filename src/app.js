@@ -13,10 +13,12 @@ import {RegisterUserCommand, RegisterUserHandler} from "./commands/auth/register
 import {SessionRepository} from "./repositories/sessionRepository.js";
 import {AuthDomainService} from "./services/authDomainService.js";
 import {PasswordLoginCommand, PasswordLoginHandler} from "./commands/auth/passwordLogin.js";
+import errorHandler from "./hooks/errorHandler.js";
 
 const fastify = Fastify({logger: false});
 
 // Register routes
+fastify.setErrorHandler(errorHandler);
 fastify.register(routes);
 
 fastify.setValidatorCompiler(validatorCompiler);
