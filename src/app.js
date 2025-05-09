@@ -12,7 +12,7 @@ import {Mediator} from "./mediator/index.js";
 import {RegisterUserCommand, RegisterUserHandler} from "./commands/auth/registerUser.js";
 import {SessionRepository} from "./repositories/sessionRepository.js";
 import {AuthDomainService} from "./services/authDomainService.js";
-import {PasswordLoginHandler} from "./commands/auth/passwordLogin.js";
+import {PasswordLoginCommand, PasswordLoginHandler} from "./commands/auth/passwordLogin.js";
 
 const fastify = Fastify({logger: false});
 
@@ -47,6 +47,7 @@ container.registerTransient(PasswordLoginHandler, (c) => new PasswordLoginHandle
 export const mediator = new Mediator();
 
 mediator.register(RegisterUserCommand, () => container.resolve(RegisterUserHandler));
+mediator.register(PasswordLoginCommand, () => container.resolve(PasswordLoginHandler));
 
 // Start the server
 const start = async () => {
