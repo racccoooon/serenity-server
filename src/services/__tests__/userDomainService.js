@@ -84,7 +84,7 @@ test('find existing user', async () => {
     // act
     const user = await sut.findUser(UserSelector.from("<UserName>"));
 
-    // act
+    // assert
     expect(user).toEqual(new User(new UserName("LittleBean"), "bean@karo.gay", new UserId("76f69c5f-3884-47c4-94d7-dff8f44270cf"))
         .withAuthentication(PasswordAuthentication.fromHash("<Hash>")));
 });
