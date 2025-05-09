@@ -2,6 +2,7 @@ import {NewType} from "./_newType.js";
 import {z} from "zod";
 import {UserId, userIdSchema} from "./user.js";
 import {v4} from "uuid";
+import { randomBytes, createHash } from 'crypto';
 
 export const sessionTokenSchema = z.string().trim().nonempty();
 
@@ -26,22 +27,50 @@ export class SessionId extends NewType {
 export class Session {
     #id;
     #userId;
+    #salt;
+    #hashedSecret;
 
     /**
      * @param {import('user.js').UserId} userId
-     * @param {SessionId|null} id
+     * @returns {{session: Session, secret: Buffer}}
      */
-    constructor(userId, id = null) {
+    static fresh(userId) {
         if (!(userId instanceof UserId)) throw new Error('UserId must be a UserId');
 
-        if (id) {
-            if (!(id instanceof SessionId)) throw new Error('Id must be a SessionId');
-            this.#id = id;
-        } else {
-            this.#id = SessionId.fresh();
-        }
+        const salt = randomBytes(16);
+        const secret = randomBytes(16);
 
-        this.#userId = userId;
+        const hash = createHash('sha256');
+        hash.update(secret);
+        hash.update(salt);
+        const hashedSecret = hash.digest();
+
+        const session = new Session();
+        session.#id = SessionId.fresh();
+        session.#userId = userId;
+        session.#salt = salt;
+        session.#hashedSecret = hashedSecret;
+        return { session, secret };
+    }
+
+    /**
+     *
+     * @param {SessionId} id
+     * @param {UserId} userId
+     * @param {Buffer} salt
+     * @param {Buffer} hashedSecret
+     * @returns {Session}
+     */
+    static from(id, userId, salt, hashedSecret) {
+        if (!(id instanceof SessionId)) throw new Error('Id must be a SessionId');
+        if (!(userId instanceof UserId)) throw new Error('UserId must be a UserId');
+
+        const session = new Session();
+        session.#id = id;
+        session.#userId = userId;
+        session.#salt = salt;
+        session.#hashedSecret = hashedSecret;
+        return session;
     }
 
     get id(){
