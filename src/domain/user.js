@@ -1,9 +1,36 @@
-import {v4, v4 as uuidv4} from 'uuid';
+import {v4} from 'uuid';
+import {NewType} from "./_newType.js";
+import {Union} from "./_union.js";
+import {z} from "zod";
+
+export const userNameSchema = z.string({
+    message: "UserName must be a string."
+}).trim().nonempty("UserName cannot be empty.").max(63, "UserName must be at most 63 characters long.")
+
+export class UserName extends NewType {
+    validate(value) {
+        userNameSchema.parse(value)
+    }
+}
+
+export const userIdSchema = z.string().uuid()
+
+export class UserId extends NewType {
+    validate(value) {
+        userIdSchema.parse(value)
+    }
+
+    static gen() {
+        return new UserId(v4());
+    }
+}
+
+export class UserSelector extends Union(UserId, UserName) {}
 
 export class User {
-    /** @type {UUID} */
+    /** @type {UserId} */
     #id;
-    /** @type {string} */
+    /** @type {UserName} */
     #username;
     /** @type {string} */
     #email;
@@ -13,18 +40,23 @@ export class User {
     #authenticationMethods = [];
 
     /**
-     * @param {string} username
+     * @param {UserName} username
      * @param {string} email
+     * @param {UserId|null} id
      */
-    constructor(username, email) {
-        if (typeof username !== 'string') {
-            throw new Error('Username must be a string');
-        }
-        if (typeof email !== 'string') {
-            throw new Error('Email must be a string');
-        }
+    constructor(username, email, id = null) {
+        if (!(username instanceof UserName)) throw new Error('Username must be a UserName');
+        if (typeof email !== 'string') throw new Error('Email must be a string');
 
-        this.#id = v4();
+        if(id)
+        {
+            if(!(id instanceof UserId)) throw new Error('Id must be a UserId');
+            this.#id = id;
+        }
+        else
+        {
+            this.#id = UserId.gen();
+        }
 
         this.#username = username;
         this.#email = email;

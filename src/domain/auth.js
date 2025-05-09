@@ -1,4 +1,5 @@
 import {v4} from "uuid";
+import bcrypt from 'bcryptjs';
 
 /**
  * @readonly
@@ -82,7 +83,10 @@ export class PasswordAuthentication extends AuthenticationMethod {
      * @returns {Promise<PasswordAuthentication>}
      */
     static async fromPlain(password) {
-        const hash = "";//TODO: await bcrypt.hash(password, 12);
+        if (!password) {
+            throw new Error("Password is required.");
+        }
+        const hash = await bcrypt.hash(password, 12);
         return new PasswordAuthentication(hash);
     }
 
@@ -93,5 +97,14 @@ export class PasswordAuthentication extends AuthenticationMethod {
      */
     static fromHash(passwordHash) {
         return new PasswordAuthentication(passwordHash);
+    }
+
+    /**
+     * Validates a plain text password against the hash stored in this model.
+     * @param {String} password
+     * @returns {boolean}
+     */
+    async validateHash(password) {
+        return await bcrypt.compare(password, this.passwordHash);
     }
 }

@@ -1,7 +1,7 @@
-import {RegisterUserHandler} from "../users/registerUser.js";
+import {RegisterUserHandler} from "../auth/registerUser.js";
 import { jest } from '@jest/globals';
 import {PasswordAuthentication} from "../../domain/auth.js";
-import {User} from "../../domain/user.js";
+import {User, UserId, UserName} from "../../domain/user.js";
 
 test('Register user without command', async () => {
     const handler = new RegisterUserHandler();
@@ -11,14 +11,14 @@ test('Register user without command', async () => {
 test('Register user without authentication method', async () => {
     const command = {authenticationMethods: []};
     const handler = new RegisterUserHandler({});
-    expect(handler.handle(command, {})).rejects.toThrow('Missing authentication method');
+    expect(handler.handle(command)).rejects.toThrow('Missing authentication method');
 });
 
 
 test('Register user', async () => {
     // arrange
     const command = {
-        username: '<USER>',
+        username: new UserName('<USER>'),
         email: '<EMAIL>',
         authenticationMethods: [{ type: 'password', details: { password: '<PASSWORD>' }}]
     };
@@ -26,10 +26,9 @@ test('Register user', async () => {
     const handler = new RegisterUserHandler(userService);
 
     // act
-    const response = await handler.handle(command);
+    const _ = await handler.handle(command);
 
     // assert
-    expect(userService.createUser).toHaveBeenCalledWith(new User('<USER>', '<EMAIL>')
+    expect(userService.createUser).toHaveBeenCalledWith(new User(new UserName('<USER>'), '<EMAIL>')
         .withAuthentication(await PasswordAuthentication.fromPlain('<PASSWORD>')));
-    expect(response).toEqual({ id: expect.any(String) });
 });
