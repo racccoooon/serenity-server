@@ -80,4 +80,12 @@ export class Session {
     get userId() {
         return this.#userId;
     }
+
+    get salt() {
+        return this.#salt;
+    }
+
+    get hashedSecret() {
+        return this.#hashedSecret;
+    }
 }
