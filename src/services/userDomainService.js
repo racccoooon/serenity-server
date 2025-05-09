@@ -1,16 +1,16 @@
 import {AuthType, PasswordAuthentication} from "../domain/auth.js";
-import {CreateUserModel} from "../repositories/userRepository.js";
-import {CreatePasswordModel} from "../repositories/userAuthRepository.js";
+import {UserModel} from "../repositories/userRepository.js";
+import {AuthMethodModel, PasswordAuthDetailsModel} from "../repositories/userAuthRepository.js";
 import {User, UserId, UserName, UserSelector} from "../domain/user.js";
 
 /**
  * Maps a User domain model to CreateUserModel
  * @param {import('../domain/user').User} user
- * @returns {CreateUserModel}
+ * @returns {UserModel}
  */
 export function createUserRequestModel(user)
 {
-    const model = new CreateUserModel();
+    const model = new UserModel();
     model.id = user.id.value;
     model.username = user.username.value;
     model.email = user.email;
@@ -18,23 +18,19 @@ export function createUserRequestModel(user)
 }
 
 /**
- * Maps a User domain model to CreateUserModel
  * @param {import('../domain/user.js').UserId} userId
- * @param {import('../domain/user.js').AuthenticationMethod} method
- * @returns {CreatePasswordModel}
+ * @param {import('../domain/auth.js').AuthenticationMethod} method
+ * @returns {AuthMethodModel}
  */
-export function createPasswordRequestModel(userId, method)
+export function createPasswordRequestModel(method)
 {
     if (method.type !== AuthType.PASSWORD) {
         throw new Error('Invalid authentication type, expected type password');
     }
 
-    const data = method.getData(AuthType.PASSWORD)
-
-    const model = new CreatePasswordModel();
+    const model = new AuthMethodModel();
     model.id = method.id;
-    model.userId = userId.value;
-    model.details = data;
+    model.details = new PasswordAuthDetailsModel(method.passwordHash);
     return model;
 }
 
@@ -64,7 +60,7 @@ export class UserDomainService {
         for (const authenticationMethod of user.authenticationMethods) {
             switch (authenticationMethod.type) {
                 case AuthType.PASSWORD:
-                    await this.userAuthRepository.addPassword(createPasswordRequestModel(user.id, authenticationMethod));
+                    await this.userAuthRepository.addPassword(user.id, createPasswordRequestModel(authenticationMethod));
             }
         }
     }

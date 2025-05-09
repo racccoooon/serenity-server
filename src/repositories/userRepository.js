@@ -2,14 +2,6 @@ import {pool} from "../db/index.js";
 import {UserId, UserName} from "../domain/user.js";
 import {logger} from "../utils/logger.js";
 
-export class CreateUserModel {
-    constructor(id, username, email) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-    }
-}
-
 export class UserModel {
     constructor(id, username, email) {
         this.id = id;
@@ -37,6 +29,9 @@ export class UserRepository {
                 break;
             case selector.value instanceof UserName:
                 sqlb.add('username = $username', {username: selector.value.value});
+                break;
+            default:
+                throw new Error('Unreachable');
         }
 
         const {sql, params} = sql.build();
