@@ -20,7 +20,7 @@ export class UserId extends NewType {
         userIdSchema.parse(value)
     }
 
-    static fresh() {
+    static gen() {
         return new UserId(v4());
     }
 }
@@ -55,7 +55,7 @@ export class User {
         }
         else
         {
-            this.#id = UserId.fresh();
+            this.#id = UserId.gen();
         }
 
         this.#username = username;

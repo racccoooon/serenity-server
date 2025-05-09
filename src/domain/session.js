@@ -19,7 +19,7 @@ export class SessionId extends NewType {
         sessionIdSchema.parse(value)
     }
 
-    static fresh() {
+    static gen() {
         return new SessionId(v4());
     }
 }
@@ -34,7 +34,7 @@ export class Session {
      * @param {import('user.js').UserId} userId
      * @returns {{session: Session, secret: Buffer}}
      */
-    static fresh(userId) {
+    static gen(userId) {
         if (!(userId instanceof UserId)) throw new Error('UserId must be a UserId');
 
         const salt = randomBytes(16);
@@ -46,7 +46,7 @@ export class Session {
         const hashedSecret = hash.digest();
 
         const session = new Session();
-        session.#id = SessionId.fresh();
+        session.#id = SessionId.gen();
         session.#userId = userId;
         session.#salt = salt;
         session.#hashedSecret = hashedSecret;

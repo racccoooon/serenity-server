@@ -27,7 +27,7 @@ test('user with different password', async () => {
 test('user with correct password issues a session token', async () => {
     // arrange
     const user = {
-        id: UserId.fresh(),
+        id: UserId.gen(),
         authenticationMethods: [
             await PasswordAuthentication.fromPlain("foo"),
         ],

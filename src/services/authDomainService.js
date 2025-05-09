@@ -43,7 +43,7 @@ export class AuthDomainService {
                 continue;
             }
 
-            const {session, secret} = Session.fresh(user.id);
+            const {session, secret} = Session.gen(user.id);
 
             await this.sessionRepository.add(createSessionRequestModel(session));
 
