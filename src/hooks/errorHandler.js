@@ -18,5 +18,6 @@ export default function errorHandler(error, request, reply) {
     }
 
     // Catch-all fallback
+    logger.error(error.stack || error);
     return reply.code(500).send({ error: 'Internal Server Error' });
 }

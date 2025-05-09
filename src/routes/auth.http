@@ -23,5 +23,9 @@ Accept: application/json
 
 {
   "username": "Bean27",
-  "password": "secrdfetbean!"
+  "password": "secretbean!"
 }
+
+> {%
+    client.global.set('bearer_token', response.headers.valueOf("authorization"));
+%}
