@@ -3,6 +3,7 @@ import { extendZodWithOpenApi } from 'zod-openapi';
 import {RegisterUserCommand} from "../commands/auth/registerUser.js";
 import {mediator} from "../app.js";
 import {status} from "http-status";
+import {PasswordLoginCommand} from "../commands/auth/passwordLogin.js";
 
 extendZodWithOpenApi(z);
 
@@ -52,6 +53,13 @@ export async function passwordLogin(fastify) {
             body: loginSchema,
         },
     }, async (request, reply) => {
-        reply.code(status.NOT_IMPLEMENTED);
+        const requestDto = request.body;
+
+        const response = await mediator.send(new PasswordLoginCommand(
+            requestDto.username,
+            requestDto.email,
+            requestDto.authenticationMethods));
+
+        reply.body= response;
     })
 }

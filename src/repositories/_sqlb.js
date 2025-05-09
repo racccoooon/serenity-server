@@ -1,8 +1,9 @@
-class Sqlb {
+export class Sqlb {
     constructor(sql = null, paramObj = {}) {
         this.query = '';
         this.params = [];
         this.paramCount = 1;  // Start with $1 for the first parameter
+
 
         if (!!sql) {
             this.add(sql, paramObj);
@@ -28,6 +29,6 @@ class Sqlb {
 
     // Build the final SQL query and parameters
     build() {
-        return { query: this.query + ";", params: this.params };
+        return { sql: this.query + ";", params: this.params };
     }
 }

@@ -1,5 +1,6 @@
 import {pool} from "../db/index.js";
 import {logger} from "../utils/logger.js";
+import {Sqlb} from "./_sqlb.js";
 
 export class AuthMethodModel {
     constructor(id, type, details) {
@@ -40,7 +41,7 @@ export class UserAuthRepository {
 
         sqlb.add('user_id = $userId', {userId: userId.value});
 
-        const {sql, params} = sql.build();
+        const {sql, params} = sqlb.build();
         logger.debug("executing sql: ", sql);
         const result = await pool.query(sql, params);
 

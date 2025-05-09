@@ -1,4 +1,5 @@
 import {SessionToken} from "../../domain/session.js";
+import {UserSelector} from "../../domain/user.js";
 
 export class PasswordLoginCommand {
     constructor(userSelector, password) {
@@ -13,7 +14,11 @@ export class LoginResponse {
     }
 }
 
-export class AuthorizationError extends Error{}
+export class AuthorizationError extends Error{
+    constructor() {
+        super("Unauthorized");
+    }
+}
 
 export class PasswordLoginHandler {
     constructor(userDomainService, authDomainService) {
@@ -27,12 +32,12 @@ export class PasswordLoginHandler {
     handle = async(command) => {
         if (!command) throw new Error('Command must be provided');
 
-        const user = this.userDomainService.findUser(command.userSelector);
+        const user = await this.userDomainService.findUser(UserSelector.from(command.userSelector));
         if(!user){
             throw new AuthorizationError();
         }
 
-        let sessionToken = this.authDomainService.tryPasswordLogin(user, command.password);
+        let sessionToken = await this.authDomainService.tryPasswordLogin(user, command.password);
         if (!sessionToken) {
             throw new AuthorizationError();
         }

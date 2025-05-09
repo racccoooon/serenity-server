@@ -1,6 +1,7 @@
 import {pool} from "../db/index.js";
 import {UserId, UserName} from "../domain/user.js";
 import {logger} from "../utils/logger.js";
+import {Sqlb} from "./_sqlb.js";
 
 export class UserModel {
     constructor(id, username, email) {
@@ -34,7 +35,7 @@ export class UserRepository {
                 throw new Error('Unreachable');
         }
 
-        const {sql, params} = sql.build();
+        const {sql, params} = sqlb.build();
         logger.debug("executing sql: ", sql);
         const result = await pool.query(sql, params);
 
