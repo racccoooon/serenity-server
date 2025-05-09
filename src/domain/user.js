@@ -23,7 +23,6 @@ export class UserId extends NewType {
 
 export class UserSelector extends Union(UserId, UserName) {}
 
-
 export class User {
     /** @type {UserId} */
     #id;

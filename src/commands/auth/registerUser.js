@@ -32,7 +32,7 @@ export class RegisterUserHandler {
         for (const authenticationMethod of command.authenticationMethods) {
             switch (authenticationMethod.type) {
                 case 'password':
-                    user.withAuthentication(await PasswordAuthentication.fromPlain(authenticationMethod.password));
+                    user.withAuthentication(await PasswordAuthentication.fromPlain(authenticationMethod.details.password));
             }
         }
 
