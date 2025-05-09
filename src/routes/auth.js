@@ -59,6 +59,7 @@ export async function passwordLogin(fastify) {
             requestDto.username,
             requestDto.password));
 
-        reply.body= response;
+        reply.header('Authorization', `Bearer ${response.sessionToken}`);
+        reply.code(status.NO_CONTENT);
     })
 }

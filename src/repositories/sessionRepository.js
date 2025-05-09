@@ -11,10 +11,9 @@ export class CreateSessionModel {
 
 export class SessionRepository {
     async add(param) {
-        console.log(param)
         await pool.query(`
             insert into sessions(id, user_id, salt, hashed_secret)
-            values ();`,
+            values ($1, $2, $3, $4);`,
             [param.id, param.userId, param.salt, param.hashedSecret]);
     }
 }
