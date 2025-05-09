@@ -1,4 +1,4 @@
-import {AuthorizationError} from "../commands/auth/passwordLogin.js";
+import {AuthorizationError} from "../errors/authorizationError.js";
 
 export default function errorHandler(error, request, reply) {
     if (error instanceof AuthorizationError) {

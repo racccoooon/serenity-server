@@ -1,5 +1,6 @@
-import {AuthorizationError, PasswordLoginCommand, PasswordLoginHandler} from "../auth/passwordLogin.js";
+import { PasswordLoginCommand, PasswordLoginHandler} from "../auth/passwordLogin.js";
 import { jest } from '@jest/globals';
+import {AuthorizationError} from "../../errors/authorizationError.js";
 
 test('Login user without command', async () => {
     const handler = new PasswordLoginHandler();

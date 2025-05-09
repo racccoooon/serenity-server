@@ -1,9 +1,14 @@
-import { z } from 'zod';
-import { extendZodWithOpenApi } from 'zod-openapi';
+import {z} from 'zod';
+import {extendZodWithOpenApi} from 'zod-openapi';
 import {RegisterUserCommand} from "../commands/auth/registerUser.js";
-import {mediator} from "../app.js";
+import {container, mediator} from "../app.js";
 import {status} from "http-status";
-import {PasswordLoginCommand} from "../commands/auth/passwordLogin.js";
+import { PasswordLoginCommand} from "../commands/auth/passwordLogin.js";
+import {AuthorizationError} from "../errors/authorizationError.js";
+import {stringify} from "uuid";
+import {SessionRepository} from "../repositories/sessionRepository.js";
+import {createHash} from "crypto";
+import {getHttpAuthStrategy} from "./_httpAuth.js";
 
 extendZodWithOpenApi(z);
 
@@ -59,7 +64,26 @@ export async function passwordLogin(fastify) {
             requestDto.username,
             requestDto.password));
 
-        reply.header('Authorization', `Bearer ${response.sessionToken}`);
+        reply.header('authorization', `Bearer ${response.sessionToken}`);
         reply.code(status.NO_CONTENT);
     })
+}
+
+const makePublicTokenSchema = z.object({
+    publicKey: z.string().nonempty(),
+});
+
+export async function makePublicToken(fastify) {
+    fastify.post('/api/v1/auth/publicToken', {
+        schema: {
+            body: makePublicTokenSchema,
+        },
+    }, async (request, reply) => {
+        const entity = await getHttpAuthStrategy(request.headers);
+        if(!entity.isLocalUser()) throw new AuthorizationError();
+
+
+
+        reply.code(status.NO_CONTENT);
+    });
 }

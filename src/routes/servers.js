@@ -4,6 +4,8 @@ import {CreateServerCommand} from "../commands/server/createServer.js";
 import {container, mediator} from "../app.js";
 import {AuthDomainService} from "../services/authDomainService.js";
 import {UserId} from "../domain/user.js";
+import {getHttpAuthStrategy} from "./_httpAuth.js";
+import {AuthorizationError} from "../errors/authorizationError.js";
 
 const createServerSchema = z.object({
     name: z.string().nonempty().max(63),
@@ -22,12 +24,13 @@ export async function createServer(fastify) {
             body: createServerSchema,
         },
     }, async (request, reply) => {
-        // TODO: validate session and make sure the user is from this server
+        const entity = await getHttpAuthStrategy(request.headers);
+        if(!entity.isLocalUser()) throw new AuthorizationError();
 
         const requestDto = request.body;
 
         const response = await mediator.send(new CreateServerCommand(
-            new UserId('7a8ac779-1b95-4f5c-987b-f5634b43b0fd'), //TODO: get current user id and not use this hardcoded id
+            new UserId(entity.id),
             requestDto.name,
             requestDto?.description
         ));

@@ -22,6 +22,11 @@ export class Container {
     this.#serviceProviders.set(interfaceType, implementation)
   }
 
+  /**
+   @template T
+   * @param {T} interfaceType
+   * @returns {T}
+   */
   resolve(interfaceType) {
     const serviceProvider = this.#serviceProviders.get(interfaceType);
 

@@ -1,4 +1,5 @@
 import {UserSelector} from "../../domain/user.js";
+import {AuthorizationError} from "../../errors/authorizationError.js";
 
 export class PasswordLoginCommand {
     constructor(userSelector, password) {
@@ -10,12 +11,6 @@ export class PasswordLoginCommand {
 export class LoginResponse {
     constructor(sessionToken) {
         this.sessionToken = sessionToken;
-    }
-}
-
-export class AuthorizationError extends Error{
-    constructor() {
-        super("Unauthorized");
     }
 }
 
