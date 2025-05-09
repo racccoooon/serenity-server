@@ -17,6 +17,7 @@ import errorHandler from "./hooks/errorHandler.js";
 import {CreateServerCommand, CreateServerHandler} from "./commands/server/createServer.js";
 import {ServerDomainService} from "./services/serverDomainService.js";
 import {ServerRepository} from "./repositories/serverRepository.js";
+import {loadKeyPair} from "./utils/crypto.js";
 
 const fastify = Fastify({logger: false});
 
@@ -67,6 +68,7 @@ mediator.register(CreateServerCommand, () => container.resolve(CreateServerHandl
 // Start the server
 const start = async () => {
     try {
+        await loadKeyPair();
         await runMigrations();
 
         await fastify.listen(config.server);

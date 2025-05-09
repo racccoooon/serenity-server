@@ -12,5 +12,9 @@ export const config = {
         port: process.env.POSTGRES_PORT || 7891,
         database: process.env.POSTGRES_DB || 'serenity'
     },
-    logLevel: process.env.LOG_LEVEL || 'info'
+    logLevel: process.env.LOG_LEVEL || 'info',
+    keyPair: {
+        privateKeyPath: process.env.PRIV_KEY_PATH || './private.pem',
+        pubKeyPath: process.env.PUB_KEY_PATH || './public.pem',
+    },
 };
