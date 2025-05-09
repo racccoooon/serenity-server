@@ -1,4 +1,13 @@
 import {AuthType} from "../domain/auth.js";
+import {CreateSessionModel} from "../repositories/sessionRepository.js";
+import {Session} from "../domain/session.js";
+
+export function createSessionRequestModel(session) {
+    const model = new CreateSessionModel();
+    model.id = session.id.value;
+    model.userId = session.userId.value;
+    return model;
+}
 
 export class AuthDomainService {
     constructor({sessionRepository}) {
@@ -21,7 +30,10 @@ export class AuthDomainService {
                 return null;
             }
 
-            return "";
+            const session = new Session(user.id);
+
+            await this.sessionRepository.add(createSessionRequestModel(session));
+            return session;
         }
 
         return null;

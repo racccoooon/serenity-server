@@ -19,6 +19,10 @@ export class UserId extends NewType {
     validate(value) {
         userIdSchema.parse(value)
     }
+
+    static fresh() {
+        return new UserId(v4());
+    }
 }
 
 export class UserSelector extends Union(UserId, UserName) {}
@@ -38,6 +42,7 @@ export class User {
     /**
      * @param {UserName} username
      * @param {string} email
+     * @param {UserId|null} id
      */
     constructor(username, email, id = null) {
         if (!(username instanceof UserName)) throw new Error('Username must be a UserName');
@@ -50,7 +55,7 @@ export class User {
         }
         else
         {
-            this.#id = new UserId(v4());
+            this.#id = UserId.fresh();
         }
 
         this.#username = username;

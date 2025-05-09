@@ -1,5 +1,8 @@
-import {AuthDomainService} from "../authDomainService.js";
+import {AuthDomainService, createSessionRequestModel} from "../authDomainService.js";
 import {PasswordAuthentication} from "../../domain/auth.js";
+import {UserId} from "../../domain/user.js";
+import { jest } from '@jest/globals';
+import {createUserRequestModel} from "../userDomainService.js";
 
 test('user without password', async () => {
     const user = {
@@ -13,7 +16,7 @@ test('user without password', async () => {
 test('user with different password', async () => {
     const user = {
         authenticationMethods: [
-            PasswordAuthentication.fromPlain("bar"),
+            await PasswordAuthentication.fromPlain("bar"),
         ],
     };
     const authService = new AuthDomainService({sessionRepository: {}});
@@ -22,12 +25,24 @@ test('user with different password', async () => {
 });
 
 test('user with correct password issues a session token', async () => {
+    // arrange
     const user = {
+        id: UserId.fresh(),
         authenticationMethods: [
             await PasswordAuthentication.fromPlain("foo"),
         ],
     };
-    const authService = new AuthDomainService({sessionRepository: {}});
+
+    const sessionRepository = {
+        add: jest.fn(),
+    };
+
+    const authService = new AuthDomainService({sessionRepository});
+
+    // act
     let sessionToken = await authService.tryPasswordLogin(user, "foo");
+
+    // assert
     expect(sessionToken).not.toBe(null);
+    expect(sessionRepository.add).toHaveBeenCalled();
 });
