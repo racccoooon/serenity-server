@@ -1,0 +1,2 @@
+### health check
+GET http://localhost:5680/.well-known/serenity/pubkey
