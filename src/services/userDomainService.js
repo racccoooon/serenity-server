@@ -60,7 +60,7 @@ export class UserDomainService {
         for (const authenticationMethod of user.authenticationMethods) {
             switch (authenticationMethod.type) {
                 case AuthType.PASSWORD:
-                    await this.userAuthRepository.addPassword(user.id, createPasswordRequestModel(authenticationMethod));
+                    await this.userAuthRepository.addPassword(user.id.value, createPasswordRequestModel(authenticationMethod));
             }
         }
     }

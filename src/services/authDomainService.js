@@ -40,13 +40,16 @@ export class AuthDomainService {
             }
 
             if (!await authenticationMethod.validateHash(password)){
-                return null;
+                continue;
             }
 
+            console.log("ayo?")
             const {session, secret} = Session.fresh(user.id);
 
+            console.log("ayo!")
             await this.sessionRepository.add(createSessionRequestModel(session));
 
+            console.log("ayo.")
             return formatSessionToken(session.id.value, secret);
         }
 

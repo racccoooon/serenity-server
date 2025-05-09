@@ -1,4 +1,3 @@
-import {SessionToken} from "../../domain/session.js";
 import {UserSelector} from "../../domain/user.js";
 
 export class PasswordLoginCommand {

@@ -57,8 +57,7 @@ export async function passwordLogin(fastify) {
 
         const response = await mediator.send(new PasswordLoginCommand(
             requestDto.username,
-            requestDto.email,
-            requestDto.authenticationMethods));
+            requestDto.password));
 
         reply.body= response;
     })

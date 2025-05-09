@@ -36,7 +36,7 @@ export class UserRepository {
         }
 
         const {sql, params} = sqlb.build();
-        logger.debug("executing sql: ", sql);
+        logger.debug(`executing sql: ${sql}`);
         const result = await pool.query(sql, params);
 
         const users = result.rows.map(row => new UserModel(row.id, row.username, row.email));

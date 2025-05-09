@@ -26,7 +26,7 @@ export class UserAuthRepository {
         await pool.query(`
             insert into user_auth (id, user_id, type, details)
             values ($1, $2, $3, $4);`,
-            [authMethod.id, userId.value, 'password', authMethod.details]);
+            [authMethod.id, userId, 'password', authMethod.details]);
     }
 
     /**
@@ -39,10 +39,10 @@ export class UserAuthRepository {
             `select id, type, details from user_auth where`
         );
 
-        sqlb.add('user_id = $userId', {userId: userId.value});
+        sqlb.add('user_id = $userId', {userId: userId});
 
         const {sql, params} = sqlb.build();
-        logger.debug("executing sql: ", sql);
+        logger.debug(`executing sql: ${sql}`);
         const result = await pool.query(sql, params);
 
         return result.rows.map(row => {
