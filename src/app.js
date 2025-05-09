@@ -14,6 +14,9 @@ import {SessionRepository} from "./repositories/sessionRepository.js";
 import {AuthDomainService} from "./services/authDomainService.js";
 import {PasswordLoginCommand, PasswordLoginHandler} from "./commands/auth/passwordLogin.js";
 import errorHandler from "./hooks/errorHandler.js";
+import {CreateServerCommand, CreateServerHandler} from "./commands/server/createServer.js";
+import {ServerDomainService} from "./services/serverDomainService.js";
+import {ServerRepository} from "./repositories/serverRepository.js";
 
 const fastify = Fastify({logger: false});
 
@@ -33,10 +36,14 @@ container.registerTransient(UserDomainService, (c) => new UserDomainService({
 container.registerTransient(AuthDomainService, (c) => new AuthDomainService({
     sessionRepository: c.resolve(SessionRepository),
 }));
+container.registerTransient(ServerDomainService, (c) => new ServerDomainService({
+    serverRepository: c.resolve(ServerRepository),
+}));
 
 container.registerTransient(UserRepository, () => new UserRepository());
 container.registerTransient(UserAuthRepository, () => new UserAuthRepository());
 container.registerTransient(SessionRepository, () => new SessionRepository());
+container.registerTransient(ServerRepository, () => new ServerRepository());
 
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
     c.resolve(UserDomainService),
@@ -46,10 +53,16 @@ container.registerTransient(PasswordLoginHandler, (c) => new PasswordLoginHandle
     c.resolve(AuthDomainService),
 ));
 
+container.registerTransient(CreateServerHandler, (c) => new CreateServerHandler(
+    c.resolve(ServerDomainService),
+));
+
 export const mediator = new Mediator();
 
 mediator.register(RegisterUserCommand, () => container.resolve(RegisterUserHandler));
 mediator.register(PasswordLoginCommand, () => container.resolve(PasswordLoginHandler));
+
+mediator.register(CreateServerCommand, () => container.resolve(CreateServerHandler));
 
 // Start the server
 const start = async () => {
