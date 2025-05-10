@@ -1,22 +1,23 @@
+import { Client } from 'pg';
 import pg from 'pg';
-import { migrate } from 'postgres-migrations';
-import { config } from '../config/settings.js';
-import { logger } from '../utils/logger.js';
+import {migrate} from 'postgres-migrations';
+import {config} from '../config/settings.js';
+import {logger} from '../utils/logger.js';
 
-const { Pool } = pg;
+const {Pool} = pg;
 
-const pool = new Pool(config.db);
+export const pool = new Pool(config.db);
 
 // Add error handling for the pool
 pool.on('error', (err) => {
-  logger.error('Unexpected error on idle client', err);
+    logger.error('Unexpected error on idle client', err);
 });
 
 const dbConfig = {
     ...config.db,
 };
 
-async function runMigrations() {
+export async function runMigrations() {
     try {
         // Run migrations
         await migrate(dbConfig, './src/db/migrations');
@@ -28,4 +29,49 @@ async function runMigrations() {
     }
 }
 
-export { pool, runMigrations };
+// @ts-check
+
+/**
+ * Manages a PostgreSQL transaction with automatic commit/rollback.
+ */
+export class DbTransaction {
+    /**
+     * @type {Client | null}
+     */
+    #client = null;
+
+    /**
+     * Starts a transaction (if there isn't one already) and returns the client.
+     * @returns {Promise<Client>}
+     */
+    async tx() {
+        if (!this.#client) {
+            this.#client = await pool.connect();
+            await this.#client.query('BEGIN');
+        }
+        return this.#client;
+    }
+
+    /**
+     * Commits the transaction if possible, otherwise rolls back.
+     * Always releases the client.
+     * @returns {Promise<void>}
+     */
+    async dispose() {
+        if (!this.#client) return;
+
+        try {
+            await this.#client.query('COMMIT');
+        } catch (err) {
+            try {
+                await this.#client.query('ROLLBACK');
+            } catch (e){
+                logger.error('Failed to rollback transaction: ', e);
+            }
+            throw err;
+        } finally {
+            this.#client.release();
+            this.#client = null;
+        }
+    }
+}

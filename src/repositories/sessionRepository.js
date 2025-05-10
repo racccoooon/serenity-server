@@ -1,5 +1,3 @@
-import {pool} from "../db/index.js";
-
 export class SessionModel {
     constructor(id, userId, salt, hashedSecret) {
         this.id = id;
@@ -11,14 +9,16 @@ export class SessionModel {
 
 export class SessionRepository {
     async add(param) {
-        await pool.query(`
-                    insert into sessions(id, user_id, salt, hashed_secret)
-                    values ($1, $2, $3, $4);`,
+        const tx = await this.dbTransaction.tx();
+        await tx.query(`
+            insert into sessions(id, user_id, salt, hashed_secret)
+            values ($1, $2, $3, $4);`,
             [param.id, param.userId, param.salt, param.hashedSecret]);
     }
 
     async find(id) {
-        const result = await pool.query(`select id, user_id, salt, hashed_secret
+        const tx = await this.dbTransaction.tx();
+        const result = await tx.query(`select id, user_id, salt, hashed_secret
                     from sessions
                     where id = $1`,
             [id]);

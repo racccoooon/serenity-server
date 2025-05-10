@@ -1,4 +1,3 @@
-import {pool} from "../db/index.js";
 import {logger} from "../utils/logger.js";
 import {Sqlb} from "./_sqlb.js";
 
@@ -17,13 +16,18 @@ export class PasswordAuthDetailsModel {
 }
 
 export class UserAuthRepository {
+    constructor(dbTransaction) {
+        this.dbTransaction = dbTransaction;
+    }
+
     /**
      * @param {import('../domain/user.js').UserId} userId
      * @param {AuthMethodModel} authMethod
      * @returns {Promise<void>}
      */
     async addPassword(userId, authMethod) {
-        await pool.query(`
+        const tx = await this.dbTransaction.tx();
+        await tx.query(`
             insert into user_auth (id, user_id, type, details)
             values ($1, $2, $3, $4);`,
             [authMethod.id, userId, 'password', authMethod.details]);
@@ -43,7 +47,8 @@ export class UserAuthRepository {
 
         const {sql, params} = sqlb.build();
         logger.debug(`executing sql: ${sql}`);
-        const result = await pool.query(sql, params);
+        const tx = await this.dbTransaction.tx();
+        const result = await tx.query(sql, params);
 
         return result.rows.map(row => {
             switch (row.type) {

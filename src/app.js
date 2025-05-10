@@ -2,7 +2,7 @@ import Fastify from 'fastify';
 import {logger} from './utils/logger.js';
 import {config} from './config/settings.js';
 import {routes} from './routes/index.js';
-import {runMigrations} from "./db/index.js";
+import {DbTransaction, runMigrations} from "./db/index.js";
 import {serializerCompiler, validatorCompiler} from "fastify-zod-openapi";
 import {Container} from "./container/index.js";
 import {UserDomainService} from "./services/userDomainService.js";
@@ -19,11 +19,13 @@ import {ServerDomainService} from "./services/serverDomainService.js";
 import {ServerRepository} from "./repositories/serverRepository.js";
 import {loadKeyPair} from "./utils/crypto.js";
 import {CreatePublicTokenCommand, CreatePublicTokenHandler} from "./commands/auth/createPublicToken.js";
+import {perRequestScopeHook} from "./hooks/perRequestScope.js";
 
 const fastify = Fastify({logger: false});
 
 // Register routes
 fastify.setErrorHandler(errorHandler);
+perRequestScopeHook(fastify)
 fastify.register(routes);
 
 fastify.setValidatorCompiler(validatorCompiler);
@@ -41,6 +43,10 @@ container.registerTransient(AuthDomainService, (c) => new AuthDomainService({
 container.registerTransient(ServerDomainService, (c) => new ServerDomainService({
     serverRepository: c.resolve(ServerRepository),
 }));
+
+container.registerScoped(DbTransaction, () => {
+    return new DbTransaction();
+});
 
 container.registerTransient(UserRepository, () => new UserRepository());
 container.registerTransient(UserAuthRepository, () => new UserAuthRepository());
