@@ -19,25 +19,29 @@ export class AuthenticatedEntity {
     }
 }
 
+const BEARER_PREFIX = "Bearer ";
+const SESSION_TOKEN_PREFIX = "sessionToken_";
+const UUID_BYTES_LENGTH = 36;
+
 export async function getHttpAuthStrategy(headers){
     const bearerToken = headers['authorization'];
     if(bearerToken){
-        if(!bearerToken.startsWith("Bearer ")){
+        if(!bearerToken.startsWith(BEARER_PREFIX)){
             throw new AuthorizationError();
         }
 
-        const sessionToken = bearerToken.substring(7);
-        if(!sessionToken.startsWith("sessionToken_")){
+        const sessionToken = bearerToken.substring(BEARER_PREFIX.length);
+        if(!sessionToken.startsWith(SESSION_TOKEN_PREFIX)){
             throw new AuthorizationError();
         }
 
-        const sessionDataBase64 = Buffer.from(sessionToken.substring(13), 'base64');
-        if(sessionDataBase64.length < 16){
+        const sessionTokenData = Buffer.from(sessionToken.substring(SESSION_TOKEN_PREFIX.length), 'base64');
+        if(sessionTokenData.length < UUID_BYTES_LENGTH){
             throw new AuthorizationError();
         }
 
-        const sessionId = sessionDataBase64.subarray(0, 36).toString();
-        const secret = sessionDataBase64.subarray(36);
+        const sessionId = sessionTokenData.subarray(0, UUID_BYTES_LENGTH).toString();
+        const secret = sessionTokenData.subarray(UUID_BYTES_LENGTH);
 
         const sessionRepo = container.resolve(SessionRepository);
         const dbSession = await sessionRepo.find(sessionId);
