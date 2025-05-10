@@ -4,8 +4,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "username": "Bean127",
-  "email": "bean127@karo.gay",
+  "username": "Bean27",
+  "email": "bean27@karo.gay",
   "authenticationMethods": [
     {
       "type": "password",

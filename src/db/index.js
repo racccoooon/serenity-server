@@ -1,4 +1,4 @@
-import { Client } from 'pg';
+import {Client} from 'pg';
 import pg from 'pg';
 import {migrate} from 'postgres-migrations';
 import {config} from '../config/settings.js';
@@ -41,15 +41,35 @@ export class DbTransaction {
     #client = null;
 
     /**
+     * @type {Boolean}
+     */
+    #ended = false;
+
+    /**
      * Starts a transaction (if there isn't one already) and returns the client.
      * @returns {Promise<Client>}
      */
     async tx() {
+        if (this.#ended) throw new Error("Transaction has ended.");
+
         if (!this.#client) {
             this.#client = await pool.connect();
             await this.#client.query('BEGIN');
         }
+
         return this.#client;
+    }
+
+    async rollback() {
+        if (!this.#client) return;
+
+        this.#ended = true;
+
+        try {
+            await this.#client.query('ROLLBACK');
+        } catch (e) {
+            logger.error('Failed to rollback transaction: ', e);
+        }
     }
 
     /**
@@ -61,14 +81,10 @@ export class DbTransaction {
         if (!this.#client) return;
 
         try {
-            await this.#client.query('COMMIT');
-        } catch (err) {
-            try {
-                await this.#client.query('ROLLBACK');
-            } catch (e){
-                logger.error('Failed to rollback transaction: ', e);
+            if (!this.#ended) {
+                this.#ended = true;
+                await this.#client.query('COMMIT');
             }
-            throw err;
         } finally {
             this.#client.release();
             this.#client = null;

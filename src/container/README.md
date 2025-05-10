@@ -86,7 +86,7 @@ resources such as database connections or file handles.
 ```javascript
 class MyScopedService {
     dispose() {
-        console.log('Disposed');
+        // dispose logic
     }
 }
 
