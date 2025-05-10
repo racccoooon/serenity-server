@@ -10,7 +10,7 @@ export class CreatePublicTokenCommand {
     }
 }
 
-export class CreatePublicTokenResponse{
+export class CreatePublicTokenResponse {
     constructor(jwt) {
         this.jwt = jwt;
     }
