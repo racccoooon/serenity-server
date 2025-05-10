@@ -2,8 +2,8 @@ import {UserSelector} from "../../domain/user.js";
 import {AuthError} from "../../errors/authError.js";
 
 export class PasswordLoginCommand {
-    constructor(userSelector, password) {
-        this.userSelector = userSelector;
+    constructor(username, password) {
+        this.username = username;
         this.password = password;
     }
 }
@@ -26,7 +26,7 @@ export class PasswordLoginHandler {
     handle = async(command) => {
         if (!command) throw new Error('Command must be provided');
 
-        const user = await this.userDomainService.findUser(UserSelector.from(command.userSelector));
+        const user = await this.userDomainService.findUser(UserSelector.from(command.username));
         if(!user){
             throw new AuthError();
         }

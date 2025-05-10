@@ -1,7 +1,12 @@
 import {AuthError} from "../errors/authError.js";
 import {logger} from "../utils/logger.js";
+import {DbTransaction} from "../db/index.js";
 
-export default function errorHandler(error, request, reply) {
+export default async function errorHandler(error, request, reply) {
+    // we roll back any potential existing transaction
+    const dbTransaction = request.scope.resolve(DbTransaction);
+    await dbTransaction.rollback();
+
     if (error instanceof AuthError) {
         return reply.code(401).send();
     }

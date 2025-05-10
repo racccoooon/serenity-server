@@ -1,4 +1,3 @@
-import {pool} from "../db/index.js";
 import {UserId, UserName} from "../domain/user.js";
 import {logger} from "../utils/logger.js";
 import {Sqlb} from "./_sqlb.js";
@@ -12,8 +11,13 @@ export class UserModel {
 }
 
 export class UserRepository {
+    constructor(dbTransaction) {
+        this.dbTransaction = dbTransaction;
+    }
+
     async add(param) {
-        await pool.query(`
+        const tx = await this.dbTransaction.tx();
+        await tx.query(`
             insert into users (id, username, email)
             values ($1, $2, $3);`,
             [param.id, param.username, param.email]);
@@ -37,7 +41,8 @@ export class UserRepository {
 
         const {sql, params} = sqlb.build();
         logger.debug(`executing sql: ${sql}`);
-        const result = await pool.query(sql, params);
+        const tx = await this.dbTransaction.tx();
+        const result = await tx.query(sql, params);
 
         const users = result.rows.map(row => new UserModel(row.id, row.username, row.email));
 

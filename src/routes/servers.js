@@ -1,11 +1,10 @@
 import {z} from 'zod';
 import {status} from "http-status";
 import {CreateServerCommand} from "../commands/server/createServer.js";
-import {container, mediator} from "../app.js";
-import {AuthDomainService} from "../services/authDomainService.js";
 import {UserId} from "../domain/user.js";
 import {authenticateEntity} from "./_httpAuth.js";
 import {AuthError} from "../errors/authError.js";
+import {Mediator} from "../mediator/index.js";
 
 const createServerSchema = z.object({
     name: z.string().nonempty().max(63),
@@ -24,16 +23,17 @@ export function createServer(fastify) {
             body: createServerSchema,
         },
     }, async (request, reply) => {
-        const entity = await authenticateEntity(request.headers);
-        if(!entity.isLocalUser()) throw new AuthError();
+        const entity = await authenticateEntity(request);
+        if (!entity.isLocalUser()) throw new AuthError();
 
         const requestDto = request.body;
 
-        const response = await mediator.send(new CreateServerCommand(
-            new UserId(entity.id),
-            requestDto.name,
-            requestDto?.description
-        ));
+        const response = await request.scope.resolve(Mediator)
+            .send(new CreateServerCommand(
+                new UserId(entity.id),
+                requestDto.name,
+                requestDto?.description
+            ));
 
         reply.code(status.OK)
             .send(new CreateServerResponse(response.id.value));

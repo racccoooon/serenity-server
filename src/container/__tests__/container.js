@@ -9,6 +9,17 @@ class TestImplementation {
     doSomething() {}
 }
 
+class TestDisposingImplementation {
+    constructor() {
+        this._disposed = false;
+    }
+
+    dispose() {
+        this._disposed = true;
+    }
+
+    doSomething() {}
+}
 
 test('registering non-class interface throws error', () => {
     const container = new Container()
@@ -101,3 +112,68 @@ test('throws when resolving unregistered service', () => {
         container.resolve(TestInterface)
     }).toThrow('No registration found for TestInterface')
 })
+
+test('resolving scoped service from root container throws', () => {
+    const container = new Container()
+
+    container.registerScoped(TestInterface, (c) => new TestImplementation())
+
+    expect(() => {
+        container.resolve(TestInterface)
+    }).toThrow('Scoped services must be resolved from a scope')
+})
+
+
+test('scoped service returns same instance within scope, different across scopes', () => {
+    const container = new Container();
+
+    class ScopedService {}
+
+    container.registerScoped(ScopedService, () => new ScopedService());
+
+    const scope1 = container.createScope();
+    const scope2 = container.createScope();
+
+    const instance1a = scope1.resolve(ScopedService);
+    const instance1b = scope1.resolve(ScopedService);
+    const instance2 = scope2.resolve(ScopedService);
+
+    expect(instance1a).toBe(instance1b);      // Same within scope
+    expect(instance1a).not.toBe(instance2);   // Different across scopes
+});
+
+test('singleton services resolved in scope return the same instance as in root', () => {
+    const container = new Container()
+    const singletonInstance = new TestImplementation()
+
+    container.registerSingleton(TestInterface, singletonInstance)
+
+    const scope = container.createScope()
+    const resolvedFromScope = scope.resolve(TestInterface)
+    const resolvedFromRoot = container.resolve(TestInterface)
+
+    expect(resolvedFromScope).toBe(singletonInstance)
+    expect(resolvedFromRoot).toBe(singletonInstance)
+})
+
+test('dispose of scope calls dispose on scoped services', () => {
+    const container = new Container();
+
+    // Register scoped service
+    container.registerScoped(TestInterface, () => new TestDisposingImplementation());
+
+    // Create a scope
+    const scope = container.createScope();
+
+    // Resolve the scoped service
+    const resolvedService = scope.resolve(TestInterface);
+
+    // Ensure the service is an instance of TestImplementation
+    expect(resolvedService).toBeInstanceOf(TestDisposingImplementation);
+
+    // Call dispose on the scope
+    scope.dispose();
+
+    // Check that the dispose method of the scoped service was called
+    expect(resolvedService._disposed).toBe(true);
+});

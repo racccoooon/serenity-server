@@ -1,6 +1,5 @@
-// src/mediator/mediator.js
-export class Mediator {
-  #handlers = new Map()
+export class MediatorBuilder {
+  #handlers = new Map();
 
   register(commandType, handlerFactory) {
     if (!commandType?.prototype) {
@@ -11,17 +10,22 @@ export class Mediator {
       throw new Error('Handler factory must be a function')
     }
 
-    const temp = handlerFactory();
-    if(!(temp instanceof Object)) {
-      throw new Error('Handler factory must return an object')
-    }
-
-    const handleFunc = temp.handle;
-    if(typeof handleFunc !== 'function') {
-      throw new Error('Handler factory must return a class with a handle function')
-    }
-
     this.#handlers.set(commandType, handlerFactory)
+  }
+
+  build(serviceProvider) {
+    return new Mediator(this.#handlers, serviceProvider);
+  }
+}
+
+
+export class Mediator {
+  #handlers = new Map();
+  #serviceProvider = null;
+
+  constructor(handlers, serviceProvider) {
+    this.#handlers = handlers;
+    this.#serviceProvider = serviceProvider;
   }
 
   async send(command) {
@@ -30,7 +34,7 @@ export class Mediator {
       throw new Error(`No handler factory registered for ${command.constructor.name}`)
     }
 
-    const handler = handlerFactory();
+    const handler = handlerFactory(this.#serviceProvider);
 
     return await handler.handle(command)
   }

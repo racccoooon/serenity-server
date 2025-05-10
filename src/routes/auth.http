@@ -5,7 +5,7 @@ Accept: application/json
 
 {
   "username": "Bean27",
-  "email": "bean@karo.gay",
+  "email": "bean27@karo.gay",
   "authenticationMethods": [
     {
       "type": "password",
