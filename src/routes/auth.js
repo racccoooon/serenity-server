@@ -30,7 +30,7 @@ const userRegisterSchema = z.object({
     ).nonempty()
 });
 
-export async function registerUser(fastify) {
+export function registerUser(fastify) {
     fastify.post('/api/v1/auth/register', {
         schema: {
             body: userRegisterSchema,
@@ -53,7 +53,7 @@ const loginSchema = z.object({
     password: z.string().nonempty(),
 });
 
-export async function passwordLogin(fastify) {
+export function passwordLogin(fastify) {
     fastify.post('/api/v1/auth/login', {
         schema: {
             body: loginSchema,
@@ -74,7 +74,7 @@ const makePublicTokenSchema = z.object({
     publicKey: z.string().nonempty(),
 });
 
-export async function makePublicToken(fastify) {
+export function makePublicToken(fastify) {
     fastify.post('/api/v1/auth/publicToken', {
         schema: {
             body: makePublicTokenSchema,

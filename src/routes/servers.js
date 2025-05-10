@@ -18,7 +18,7 @@ class CreateServerResponse {
     }
 }
 
-export async function createServer(fastify) {
+export function createServer(fastify) {
     fastify.post('/api/v1/servers', {
         schema: {
             body: createServerSchema,
