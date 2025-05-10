@@ -23,7 +23,7 @@ export class Container {
 
     this.#serviceProviders.set(interfaceType, {
       type: 'transient',
-      value: factory
+      factory: factory
     });
   }
 
@@ -36,7 +36,7 @@ export class Container {
 
     this.#serviceProviders.set(interfaceType, {
       type: 'scoped',
-      value: factory
+      factory: factory
     });
   }
 
@@ -56,7 +56,7 @@ export class Container {
       case 'singleton':
         return entry.value;
       case 'transient':
-        return entry.value(this);
+        return entry.factory(this);
       case 'scoped':
         throw new Error('Scoped services must be resolved from a scope');
       default:
@@ -100,11 +100,11 @@ export class Scope {
         return entry.value;
 
       case 'transient':
-        return entry.value(this); // pass scope, just like container would
+        return entry.factory(this); // pass scope, just like container would
 
       case 'scoped':
         if (!this.#scopedInstances.has(interfaceType)) {
-          const instance = entry.value(this); // scope-level instance
+          const instance = entry.factory(this); // scope-level instance
           this.#scopedInstances.set(interfaceType, instance);
         }
         return this.#scopedInstances.get(interfaceType);
