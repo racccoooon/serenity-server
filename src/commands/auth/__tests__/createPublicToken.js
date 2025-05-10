@@ -1,4 +1,4 @@
-import {CreatePublicTokenHandler} from "../createPublicToken.js";
+import {CreatePublicTokenHandler, CreatePublicTokenResponse} from "../createPublicToken.js";
 import {UserId} from "../../../domain/user.js";
 import { jest } from '@jest/globals';
 
@@ -24,5 +24,5 @@ test('create jwt and sign it', async () => {
     const response = await handler.handle(command);
 
     // assert
-    expect(response).not.toBe(null);
+    expect(response).toBeInstanceOf(CreatePublicTokenResponse);
 })
