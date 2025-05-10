@@ -101,3 +101,65 @@ test('throws when resolving unregistered service', () => {
         container.resolve(TestInterface)
     }).toThrow('No registration found for TestInterface')
 })
+
+test('resolving scoped service from root container throws', () => {
+    const container = new Container()
+
+    container.registerScoped(TestInterface, (c) => new TestImplementation())
+
+    expect(() => {
+        container.resolve(TestInterface)
+    }).toThrow('Scoped services must be resolved from a scope')
+})
+
+
+test('scoped service returns same instance within scope, different across scopes', () => {
+    const container = new Container();
+
+    class ScopedService {}
+
+    container.registerScoped(ScopedService, () => new ScopedService());
+
+    const scope1 = container.createScope();
+    const scope2 = container.createScope();
+
+    const instance1a = scope1.resolve(ScopedService);
+    const instance1b = scope1.resolve(ScopedService);
+    const instance2 = scope2.resolve(ScopedService);
+
+    expect(instance1a).toBe(instance1b);      // Same within scope
+    expect(instance1a).not.toBe(instance2);   // Different across scopes
+});
+
+test('singleton services resolved in scope return the same instance as in root', () => {
+    const container = new Container()
+    const singletonInstance = new TestImplementation()
+
+    container.registerSingleton(TestInterface, singletonInstance)
+
+    const scope = container.createScope()
+    const resolvedFromScope = scope.resolve(TestInterface)
+    const resolvedFromRoot = container.resolve(TestInterface)
+
+    expect(resolvedFromScope).toBe(singletonInstance)
+    expect(resolvedFromRoot).toBe(singletonInstance)
+})
+
+test('transient services return a new instance each time across scopes and container', () => {
+    const container = new Container()
+
+    container.registerTransient(TestInterface, () => new TestImplementation())
+
+    const fromContainer1 = container.resolve(TestInterface)
+    const fromContainer2 = container.resolve(TestInterface)
+
+    const scope = container.createScope()
+    const fromScope1 = scope.resolve(TestInterface)
+    const fromScope2 = scope.resolve(TestInterface)
+
+    expect(fromContainer1).not.toBe(fromContainer2)
+    expect(fromScope1).not.toBe(fromScope2)
+    expect(fromContainer1).not.toBe(fromScope1)
+    expect(fromContainer2).not.toBe(fromScope2)
+})
+
