@@ -5,7 +5,7 @@ import {container, mediator} from "../app.js";
 import {AuthDomainService} from "../services/authDomainService.js";
 import {UserId} from "../domain/user.js";
 import {authenticateEntity} from "./_httpAuth.js";
-import {AuthorizationError} from "../errors/authorizationError.js";
+import {AuthError} from "../errors/authError.js";
 
 const createServerSchema = z.object({
     name: z.string().nonempty().max(63),
@@ -25,7 +25,7 @@ export function createServer(fastify) {
         },
     }, async (request, reply) => {
         const entity = await authenticateEntity(request.headers);
-        if(!entity.isLocalUser()) throw new AuthorizationError();
+        if(!entity.isLocalUser()) throw new AuthError();
 
         const requestDto = request.body;
 

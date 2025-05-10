@@ -4,7 +4,7 @@ import {RegisterUserCommand} from "../commands/auth/registerUser.js";
 import {container, mediator} from "../app.js";
 import {status} from "http-status";
 import { PasswordLoginCommand} from "../commands/auth/passwordLogin.js";
-import {AuthorizationError} from "../errors/authorizationError.js";
+import {AuthError} from "../errors/authError.js";
 import {stringify} from "uuid";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
@@ -81,7 +81,7 @@ export function makePublicToken(fastify) {
         },
     }, async (request, reply) => {
         const entity = await authenticateEntity(request.headers);
-        if(!entity.isLocalUser()) throw new AuthorizationError();
+        if(!entity.isLocalUser()) throw new AuthError();
 
         const requestDto = request.body;
 

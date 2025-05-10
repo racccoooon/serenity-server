@@ -1,8 +1,8 @@
-import {AuthorizationError} from "../errors/authorizationError.js";
+import {AuthError} from "../errors/authError.js";
 import {logger} from "../utils/logger.js";
 
 export default function errorHandler(error, request, reply) {
-    if (error instanceof AuthorizationError) {
+    if (error instanceof AuthError) {
         return reply.code(401).send();
     }
 

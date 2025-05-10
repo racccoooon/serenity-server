@@ -1,4 +1,4 @@
-import {AuthorizationError} from "../errors/authorizationError.js";
+import {AuthError} from "../errors/authError.js";
 import {container} from "../app.js";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
@@ -27,17 +27,17 @@ export async function authenticateEntity(headers){
     const bearerToken = headers['authorization'];
     if(bearerToken){
         if(!bearerToken.startsWith(BEARER_PREFIX)){
-            throw new AuthorizationError();
+            throw new AuthError();
         }
 
         const sessionToken = bearerToken.substring(BEARER_PREFIX.length);
         if(!sessionToken.startsWith(SESSION_TOKEN_PREFIX)){
-            throw new AuthorizationError();
+            throw new AuthError();
         }
 
         const sessionTokenData = Buffer.from(sessionToken.substring(SESSION_TOKEN_PREFIX.length), 'base64');
         if(sessionTokenData.length < UUID_BYTES_LENGTH){
-            throw new AuthorizationError();
+            throw new AuthError();
         }
 
         const sessionId = sessionTokenData.subarray(0, UUID_BYTES_LENGTH).toString();
@@ -46,7 +46,7 @@ export async function authenticateEntity(headers){
         const sessionRepo = container.resolve(SessionRepository);
         const dbSession = await sessionRepo.find(sessionId);
         if(!dbSession){
-            throw new AuthorizationError();
+            throw new AuthError();
         }
 
         const hash = createHash('sha256');
@@ -55,7 +55,7 @@ export async function authenticateEntity(headers){
         const hashedSecret = hash.digest();
 
         if(Buffer.compare(hashedSecret, dbSession.hashedSecret) !== 0){
-            throw new AuthorizationError();
+            throw new AuthError();
         }
 
         return new AuthenticatedEntity('local_user', new UserId(dbSession.userId));
@@ -67,5 +67,5 @@ export async function authenticateEntity(headers){
         //TODO: implement remote authentication + block list check
     }
 
-    throw new AuthorizationError();
+    throw new AuthError();
 }

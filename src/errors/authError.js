@@ -1,4 +1,4 @@
-export class AuthorizationError extends Error{
+export class AuthError extends Error{
     constructor() {
         super("Unauthorized");
     }
