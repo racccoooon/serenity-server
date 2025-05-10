@@ -30,7 +30,7 @@ export function createServer(fastify) {
 
         const response = await request.scope.resolve(Mediator)
             .send(new CreateServerCommand(
-                new UserId(entity.id),
+                entity.id,
                 requestDto.name,
                 requestDto?.description
             ));
