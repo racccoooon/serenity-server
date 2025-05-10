@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import {CreateServerHandler} from "../createServer.js";
+import {UserId} from "../../../domain/user.js";
 
 test('create server', async () => {
     // arrange
@@ -8,6 +9,7 @@ test('create server', async () => {
     };
 
     const command = {
+        ownerId: UserId.gen(),
         name: "BeanServer",
     };
 

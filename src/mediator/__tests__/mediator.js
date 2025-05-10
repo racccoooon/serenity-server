@@ -5,7 +5,7 @@ class TestCommand {}
 class UnregisteredCommand {}
 
 test('command handler must be a function', async () => {
-  const mediator = new Mediator()
+  const mediator = new Mediator().service({})
   
   expect(() => {
     mediator.register(TestCommand, 'not a function')
@@ -13,7 +13,7 @@ test('command handler must be a function', async () => {
 })
 
 test('registering string as command type throws error', () => {
-  const mediator = new Mediator()
+  const mediator = new Mediator().service({})
 
   expect(() => {
     mediator.register('StringCommand', () => {})
@@ -21,7 +21,7 @@ test('registering string as command type throws error', () => {
 })
 
 test('sending unregistered command throws error', async () => {
-  const mediator = new Mediator()
+  const mediator = new Mediator().service({})
   const command = new UnregisteredCommand()
 
   await expect(
@@ -30,7 +30,7 @@ test('sending unregistered command throws error', async () => {
 })
 
 test('successfully handles command', async () => {
-  const mediator = new Mediator()
+  const mediator = new Mediator().service({})
   const expectedResult = { success: true }
   const handleFunc = jest.fn().mockResolvedValue(expectedResult)
   const factory = () => ({ handle: handleFunc })
