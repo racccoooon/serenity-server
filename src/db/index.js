@@ -62,13 +62,15 @@ export class DbTransaction {
 
     async rollback() {
         if (!this.#client) return;
-
         this.#ended = true;
 
         try {
             await this.#client.query('ROLLBACK');
         } catch (e) {
             logger.error('Failed to rollback transaction: ', e);
+        } finally {
+            this.#client.release();
+            this.#client = null;
         }
     }
 
@@ -79,12 +81,13 @@ export class DbTransaction {
      */
     async dispose() {
         if (!this.#client) return;
+        this.#ended = true;
 
         try {
-            if (!this.#ended) {
-                this.#ended = true;
-                await this.#client.query('COMMIT');
-            }
+            await this.#client.query('COMMIT');
+        } catch (e) {
+            logger.error('Failed to commit transaction: ', e);
+            throw e;
         } finally {
             this.#client.release();
             this.#client = null;
