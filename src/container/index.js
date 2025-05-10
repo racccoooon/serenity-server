@@ -114,15 +114,13 @@ class Scope {
     }
   }
 
-  dispose() {
-    // Call dispose on all scoped services
-    this.#scopedInstances.forEach(service => {
+  async dispose() {
+    for (const service of this.#scopedInstances.values()) {
       if (typeof service.dispose === 'function') {
-        service.dispose();
+        await service.dispose(); // supports async dispose methods
       }
-    });
+    }
 
-    // Clear scoped services
     this.#scopedInstances.clear();
   }
 }
