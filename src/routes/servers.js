@@ -4,7 +4,7 @@ import {CreateServerCommand} from "../commands/server/createServer.js";
 import {container, mediator} from "../app.js";
 import {AuthDomainService} from "../services/authDomainService.js";
 import {UserId} from "../domain/user.js";
-import {getHttpAuthStrategy} from "./_httpAuth.js";
+import {authenticateEntity} from "./_httpAuth.js";
 import {AuthorizationError} from "../errors/authorizationError.js";
 
 const createServerSchema = z.object({
@@ -24,7 +24,7 @@ export async function createServer(fastify) {
             body: createServerSchema,
         },
     }, async (request, reply) => {
-        const entity = await getHttpAuthStrategy(request.headers);
+        const entity = await authenticateEntity(request.headers);
         if(!entity.isLocalUser()) throw new AuthorizationError();
 
         const requestDto = request.body;

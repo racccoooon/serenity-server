@@ -8,7 +8,7 @@ import {AuthorizationError} from "../errors/authorizationError.js";
 import {stringify} from "uuid";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
-import {getHttpAuthStrategy} from "./_httpAuth.js";
+import {authenticateEntity} from "./_httpAuth.js";
 import {CreatePublicTokenCommand} from "../commands/auth/createPublicToken.js";
 
 extendZodWithOpenApi(z);
@@ -80,7 +80,7 @@ export async function makePublicToken(fastify) {
             body: makePublicTokenSchema,
         },
     }, async (request, reply) => {
-        const entity = await getHttpAuthStrategy(request.headers);
+        const entity = await authenticateEntity(request.headers);
         if(!entity.isLocalUser()) throw new AuthorizationError();
 
         const requestDto = request.body;

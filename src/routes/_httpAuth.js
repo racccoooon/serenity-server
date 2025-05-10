@@ -23,7 +23,7 @@ const BEARER_PREFIX = "Bearer ";
 const SESSION_TOKEN_PREFIX = "sessionToken_";
 const UUID_BYTES_LENGTH = 36;
 
-export async function getHttpAuthStrategy(headers){
+export async function authenticateEntity(headers){
     const bearerToken = headers['authorization'];
     if(bearerToken){
         if(!bearerToken.startsWith(BEARER_PREFIX)){
