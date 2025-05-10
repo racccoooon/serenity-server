@@ -41,6 +41,8 @@ export function registerUser(fastify) {
                 requestDto.email,
                 requestDto.authenticationMethods));
 
+        throw new Error("dummy");
+
         reply.code(status.NO_CONTENT);
     });
 }

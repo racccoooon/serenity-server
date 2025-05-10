@@ -8,7 +8,7 @@ import {Container} from "./container/index.js";
 import {UserDomainService} from "./services/userDomainService.js";
 import {UserRepository} from "./repositories/userRepository.js";
 import {UserAuthRepository} from "./repositories/userAuthRepository.js";
-import {Mediator} from "./mediator/index.js";
+import {Mediator, MediatorBuilder} from "./mediator/index.js";
 import {RegisterUserCommand, RegisterUserHandler} from "./commands/auth/registerUser.js";
 import {SessionRepository} from "./repositories/sessionRepository.js";
 import {AuthDomainService} from "./services/authDomainService.js";
@@ -68,17 +68,15 @@ container.registerTransient(CreateServerHandler, (c) => new CreateServerHandler(
     c.resolve(ServerDomainService),
 ));
 
-const mediator = new Mediator();
-container.registerScoped(Mediator, (c) => mediator.service(c));
+const mediatorBuilder = new MediatorBuilder();
 
-mediator.register(RegisterUserCommand, (c) => {
-    console.log(c);
-    return c.resolve(RegisterUserHandler)
-});
-mediator.register(PasswordLoginCommand, (c) => c.resolve(PasswordLoginHandler));
-mediator.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublicTokenHandler));
+mediatorBuilder.register(RegisterUserCommand, (c) =>  c.resolve(RegisterUserHandler));
+mediatorBuilder.register(PasswordLoginCommand, (c) => c.resolve(PasswordLoginHandler));
+mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublicTokenHandler));
 
-mediator.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
+mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
+
+container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
 
 // Start the server
 const start = async () => {

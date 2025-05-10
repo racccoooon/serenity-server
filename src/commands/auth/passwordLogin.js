@@ -26,7 +26,6 @@ export class PasswordLoginHandler {
     handle = async(command) => {
         if (!command) throw new Error('Command must be provided');
 
-        console.log(command)
         const user = await this.userDomainService.findUser(UserSelector.from(command.username));
         if(!user){
             throw new AuthError();
