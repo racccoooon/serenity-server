@@ -24,5 +24,6 @@ test('create jwt and sign it', async () => {
     const response = await handler.handle(command);
 
     // assert
+    expect(userService.findUser).toHaveBeenCalled();
     expect(response).toBeInstanceOf(CreatePublicTokenResponse);
 })
