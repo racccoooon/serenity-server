@@ -24,7 +24,7 @@ export function Union(...classes) {
                 }
             }
 
-            throw new Error("Must be be convertable via constructor to one of the provided classes.");
+            throw new Error(`Must be be convertable via constructor to one of the provided classes, but got: '${values}'`);
         }
 
         get value() {
