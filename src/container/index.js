@@ -113,4 +113,16 @@ class Scope {
         throw new Error(`Unknown service type: ${entry.type}`);
     }
   }
+
+  dispose() {
+    // Call dispose on all scoped services
+    this.#scopedInstances.forEach(service => {
+      if (typeof service.dispose === 'function') {
+        service.dispose();
+      }
+    });
+
+    // Clear scoped services
+    this.#scopedInstances.clear();
+  }
 }

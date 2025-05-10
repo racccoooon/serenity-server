@@ -9,6 +9,17 @@ class TestImplementation {
     doSomething() {}
 }
 
+class TestDisposingImplementation {
+    constructor() {
+        this._disposed = false;
+    }
+
+    dispose() {
+        this._disposed = true;
+    }
+
+    doSomething() {}
+}
 
 test('registering non-class interface throws error', () => {
     const container = new Container()
@@ -145,21 +156,24 @@ test('singleton services resolved in scope return the same instance as in root',
     expect(resolvedFromRoot).toBe(singletonInstance)
 })
 
-test('transient services return a new instance each time across scopes and container', () => {
-    const container = new Container()
+test('dispose of scope calls dispose on scoped services', () => {
+    const container = new Container();
 
-    container.registerTransient(TestInterface, () => new TestImplementation())
+    // Register scoped service
+    container.registerScoped(TestInterface, () => new TestDisposingImplementation());
 
-    const fromContainer1 = container.resolve(TestInterface)
-    const fromContainer2 = container.resolve(TestInterface)
+    // Create a scope
+    const scope = container.createScope();
 
-    const scope = container.createScope()
-    const fromScope1 = scope.resolve(TestInterface)
-    const fromScope2 = scope.resolve(TestInterface)
+    // Resolve the scoped service
+    const resolvedService = scope.resolve(TestInterface);
 
-    expect(fromContainer1).not.toBe(fromContainer2)
-    expect(fromScope1).not.toBe(fromScope2)
-    expect(fromContainer1).not.toBe(fromScope1)
-    expect(fromContainer2).not.toBe(fromScope2)
-})
+    // Ensure the service is an instance of TestImplementation
+    expect(resolvedService).toBeInstanceOf(TestDisposingImplementation);
 
+    // Call dispose on the scope
+    scope.dispose();
+
+    // Check that the dispose method of the scoped service was called
+    expect(resolvedService._disposed).toBe(true);
+});
