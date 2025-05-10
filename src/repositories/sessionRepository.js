@@ -8,6 +8,10 @@ export class SessionModel {
 }
 
 export class SessionRepository {
+    constructor(dbTransaction) {
+        this.dbTransaction = dbTransaction;
+    }
+
     async add(param) {
         const tx = await this.dbTransaction.tx();
         await tx.query(`

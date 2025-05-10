@@ -1,6 +1,18 @@
 // src/mediator/mediator.js
 export class Mediator {
-  #handlers = new Map()
+  #handlers = new Map();
+  /**
+   * @type {import('../container').Scope}
+   */
+  #scope = null;
+
+  service(scope) {
+    this.scope = scope;
+    const result = new Mediator();
+    result.#scope = scope;
+    result.#handlers = this.#handlers;
+    return result;
+  }
 
   register(commandType, handlerFactory) {
     if (!commandType?.prototype) {
@@ -11,26 +23,20 @@ export class Mediator {
       throw new Error('Handler factory must be a function')
     }
 
-    const temp = handlerFactory();
-    if(!(temp instanceof Object)) {
-      throw new Error('Handler factory must return an object')
-    }
-
-    const handleFunc = temp.handle;
-    if(typeof handleFunc !== 'function') {
-      throw new Error('Handler factory must return a class with a handle function')
-    }
-
     this.#handlers.set(commandType, handlerFactory)
   }
 
   async send(command) {
+    if (!this.#scope) {
+      throw new Error("Service provider is not set. Did you forget to call `.service(scope)`?")
+    }
+
     const handlerFactory = this.#handlers.get(command.constructor)
     if (!handlerFactory) {
       throw new Error(`No handler factory registered for ${command.constructor.name}`)
     }
 
-    const handler = handlerFactory();
+    const handler = handlerFactory(this.#scope);
 
     return await handler.handle(command)
   }

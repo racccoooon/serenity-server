@@ -48,10 +48,10 @@ container.registerScoped(DbTransaction, () => {
     return new DbTransaction();
 });
 
-container.registerTransient(UserRepository, () => new UserRepository());
-container.registerTransient(UserAuthRepository, () => new UserAuthRepository());
-container.registerTransient(SessionRepository, () => new SessionRepository());
-container.registerTransient(ServerRepository, () => new ServerRepository());
+container.registerTransient(UserRepository, (c) => new UserRepository(c.resolve(DbTransaction)));
+container.registerTransient(UserAuthRepository, (c) => new UserAuthRepository(c.resolve(DbTransaction)));
+container.registerTransient(SessionRepository, (c) => new SessionRepository(c.resolve(DbTransaction)));
+container.registerTransient(ServerRepository, (c) => new ServerRepository(c.resolve(DbTransaction)));
 
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
     c.resolve(UserDomainService),
@@ -68,13 +68,17 @@ container.registerTransient(CreateServerHandler, (c) => new CreateServerHandler(
     c.resolve(ServerDomainService),
 ));
 
-export const mediator = new Mediator();
+const mediator = new Mediator();
+container.registerScoped(Mediator, (c) => mediator.service(c));
 
-mediator.register(RegisterUserCommand, () => container.resolve(RegisterUserHandler));
-mediator.register(PasswordLoginCommand, () => container.resolve(PasswordLoginHandler));
-mediator.register(CreatePublicTokenCommand, () => container.resolve(CreatePublicTokenHandler));
+mediator.register(RegisterUserCommand, (c) => {
+    console.log(c);
+    return c.resolve(RegisterUserHandler)
+});
+mediator.register(PasswordLoginCommand, (c) => c.resolve(PasswordLoginHandler));
+mediator.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublicTokenHandler));
 
-mediator.register(CreateServerCommand, () => container.resolve(CreateServerHandler));
+mediator.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
 
 // Start the server
 const start = async () => {

@@ -1,5 +1,4 @@
 import {AuthError} from "../errors/authError.js";
-import {container} from "../app.js";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
 import {UserId} from "../domain/user.js";
@@ -23,8 +22,14 @@ const BEARER_PREFIX = "Bearer ";
 const SESSION_TOKEN_PREFIX = "sessionToken_";
 const UUID_BYTES_LENGTH = 36;
 
-export async function authenticateEntity(headers){
-    const bearerToken = headers['authorization'];
+export async function authenticateEntity(request){
+    /** @type {import('../container').Scope} */
+    const scope = request.scope;
+    if(!scope){
+        throw new Error("Scope must be set on the request object. Is the fastify hook not working?")
+    }
+
+    const bearerToken = request.headers['authorization'];
     if(bearerToken){
         if(!bearerToken.startsWith(BEARER_PREFIX)){
             throw new AuthError();
@@ -43,7 +48,7 @@ export async function authenticateEntity(headers){
         const sessionId = sessionTokenData.subarray(0, UUID_BYTES_LENGTH).toString();
         const secret = sessionTokenData.subarray(UUID_BYTES_LENGTH);
 
-        const sessionRepo = container.resolve(SessionRepository);
+        const sessionRepo = scope.resolve(SessionRepository);
         const dbSession = await sessionRepo.find(sessionId);
         if(!dbSession){
             throw new AuthError();

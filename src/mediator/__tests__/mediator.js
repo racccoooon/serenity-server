@@ -29,24 +29,6 @@ test('sending unregistered command throws error', async () => {
   ).rejects.toThrow('No handler factory registered for UnregisteredCommand')
 })
 
-test('handler must return a class', async () => {
-  const mediator = new Mediator()
-  const factory = () => 3;
-
-  expect(
-      () => mediator.register(TestCommand, factory)
-    ).toThrow('Handler factory must return an object')
-})
-
-test('handler must return a type with a handle function', async () => {
-  const mediator = new Mediator()
-  const factory = () => new TestCommand();
-
-  expect(
-      () => mediator.register(TestCommand, factory)
-    ).toThrow('Handler factory must return a class with a handle function')
-})
-
 test('successfully handles command', async () => {
   const mediator = new Mediator()
   const expectedResult = { success: true }

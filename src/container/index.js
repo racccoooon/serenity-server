@@ -80,7 +80,7 @@ export class Container {
   }
 }
 
-class Scope {
+export class Scope {
   #container;
   #scopedInstances = new Map();
 

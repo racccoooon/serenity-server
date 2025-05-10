@@ -8,6 +8,10 @@ export class ServerModel {
 }
 
 export class ServerRepository {
+    constructor(dbTransaction) {
+        this.dbTransaction = dbTransaction;
+    }
+
     /**
      * @param {ServerModel} model
      * @returns {Promise<void>}
