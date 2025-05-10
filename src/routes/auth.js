@@ -1,9 +1,15 @@
-import { z } from 'zod';
-import { extendZodWithOpenApi } from 'zod-openapi';
+import {z} from 'zod';
+import {extendZodWithOpenApi} from 'zod-openapi';
 import {RegisterUserCommand} from "../commands/auth/registerUser.js";
-import {mediator} from "../app.js";
+import {container, mediator} from "../app.js";
 import {status} from "http-status";
-import {PasswordLoginCommand} from "../commands/auth/passwordLogin.js";
+import { PasswordLoginCommand} from "../commands/auth/passwordLogin.js";
+import {AuthError} from "../errors/authError.js";
+import {stringify} from "uuid";
+import {SessionRepository} from "../repositories/sessionRepository.js";
+import {createHash} from "crypto";
+import {authenticateEntity} from "./_httpAuth.js";
+import {CreatePublicTokenCommand} from "../commands/auth/createPublicToken.js";
 
 extendZodWithOpenApi(z);
 
@@ -24,7 +30,7 @@ const userRegisterSchema = z.object({
     ).nonempty()
 });
 
-export async function registerUser(fastify) {
+export function registerUser(fastify) {
     fastify.post('/api/v1/auth/register', {
         schema: {
             body: userRegisterSchema,
@@ -47,7 +53,7 @@ const loginSchema = z.object({
     password: z.string().nonempty(),
 });
 
-export async function passwordLogin(fastify) {
+export function passwordLogin(fastify) {
     fastify.post('/api/v1/auth/login', {
         schema: {
             body: loginSchema,
@@ -59,7 +65,32 @@ export async function passwordLogin(fastify) {
             requestDto.username,
             requestDto.password));
 
-        reply.header('Authorization', `Bearer ${response.sessionToken}`);
+        reply.header('authorization', `Bearer ${response.sessionToken}`);
         reply.code(status.NO_CONTENT);
     })
+}
+
+const makePublicTokenSchema = z.object({
+    publicKey: z.string().nonempty(),
+});
+
+export function makePublicToken(fastify) {
+    fastify.post('/api/v1/auth/publicToken', {
+        schema: {
+            body: makePublicTokenSchema,
+        },
+    }, async (request, reply) => {
+        const entity = await authenticateEntity(request.headers);
+        if(!entity.isLocalUser()) throw new AuthError();
+
+        const requestDto = request.body;
+
+        const response = await mediator.send(new CreatePublicTokenCommand(
+            entity.id,
+            requestDto.publicKey));
+
+        reply.code(status.OK).send({
+            jwt: response.jwt,
+        });
+    });
 }

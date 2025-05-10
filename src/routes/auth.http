@@ -29,3 +29,13 @@ Accept: application/json
 > {%
     client.global.set('bearer_token', response.headers.valueOf("authorization"));
 %}
+
+### make a public token
+POST http://localhost:5680/api/v1/auth/publicToken
+Content-Type: application/json
+Accept: application/json
+Authorization: {{bearer_token}}
+
+{
+  "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEARXSQpJzQ65Tub7lwMBZhaWjI2lVsZF+gtKnroGTg6OI=,\n-----END PUBLIC KEY-----"
+}

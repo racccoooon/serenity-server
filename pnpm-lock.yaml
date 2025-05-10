@@ -23,6 +23,9 @@ importers:
       http-status:
         specifier: ^2.1.0
         version: 2.1.0
+      jose:
+        specifier: ^6.0.11
+        version: 6.0.11
       pg:
         specifier: ^8.15.6
         version: 8.15.6
@@ -994,6 +997,9 @@ packages:
     peerDependenciesMeta:
       node-notifier:
         optional: true
+
+  jose@6.0.11:
+    resolution: {integrity: sha512-QxG7EaliDARm1O1S8BGakqncGT9s25bKL1WSf6/oa17Tkqwi8D2ZNglqCF+DsYF88/rV66Q/Q2mFAy697E1DUg==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -2809,6 +2815,8 @@ snapshots:
       - babel-plugin-macros
       - supports-color
       - ts-node
+
+  jose@6.0.11: {}
 
   js-tokens@4.0.0: {}
 

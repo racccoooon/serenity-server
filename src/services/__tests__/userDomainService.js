@@ -26,7 +26,7 @@ test('create user with password', async () => {
 
     // assert
     expect(userRepository.add).toHaveBeenCalledWith(createUserRequestModel(user));
-    expect(userAuthRepository.addPassword).toHaveBeenCalledWith(user.id, createPasswordRequestModel(authenticationMethod));
+    expect(userAuthRepository.addPassword).toHaveBeenCalledWith(user.id.value, createPasswordRequestModel(authenticationMethod));
 })
 
 test('create user requires at least one auth method', async () => {

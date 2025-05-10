@@ -1,16 +1,22 @@
 import { logger } from '../utils/logger.js';
-import {passwordLogin, registerUser} from './auth.js';
+import {makePublicToken, passwordLogin, registerUser} from './auth.js';
 import {createServer} from "./servers.js";
+import {getPublicKey} from "./wellKnown.js";
 
-export async function routes(fastify, options) {
+export function routes(fastify, options) {
   fastify.get('/api/health', async (request, reply) => {
     logger.debug('Health check requested');
     return { status: 'ok' };
   });
 
-  // auth routes
-  await registerUser(fastify);
-  await passwordLogin(fastify);
+  // well known routes
+  getPublicKey(fastify);
 
-  await createServer(fastify);
+  // auth routes
+  registerUser(fastify);
+  passwordLogin(fastify);
+  makePublicToken(fastify);
+
+  // server routes
+  createServer(fastify);
 }

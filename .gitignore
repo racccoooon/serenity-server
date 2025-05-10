@@ -234,4 +234,6 @@ fabric.properties
 # Keep .env.example in repository but ignore .env
 !.env.example
 
+/private.pem
+/public.pem
 /src/routes/http-client.private.env.json

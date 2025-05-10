@@ -18,7 +18,7 @@ test('Register user without authentication method', async () => {
 test('Register user', async () => {
     // arrange
     const command = {
-        username: new UserName('<USER>'),
+        username: '<USER>',
         email: '<EMAIL>',
         authenticationMethods: [{ type: 'password', details: { password: '<PASSWORD>' }}]
     };
