@@ -1,5 +1,11 @@
 import {UserSelector} from "../../domain/user.js";
 import {AuthError} from "../../errors/authError.js";
+import {UserFilter} from "../../repositories/userRepository.js";
+import {UserAuthFilter} from "../../repositories/userAuthRepository.js";
+import bcrypt from "bcryptjs";
+import {createHash, randomBytes} from "crypto";
+import {v4} from "uuid";
+import {DateTime} from "luxon";
 
 export class PasswordLoginCommand {
     constructor(username, password) {
@@ -15,27 +21,57 @@ export class LoginResponse {
 }
 
 export class PasswordLoginHandler {
-    constructor(userDomainService, authDomainService) {
-        this.userDomainService = userDomainService;
-        this.authDomainService = authDomainService;
+    constructor(userRepository, userAuthRepository, sessionRepository) {
+        this.userRepository = userRepository;
+        this.userAuthRepository = userAuthRepository;
+        this.sessionRepository = sessionRepository;
     }
 
-    /**
-     * @param command PasswordLoginCommand
-     */
-    handle = async(command) => {
+    handle = async (command) => {
         if (!command) throw new Error('Command must be provided');
 
-        const user = await this.userDomainService.findUser(UserSelector.from(command.username));
-        if(!user){
-            throw new AuthError();
-        }
+        const user = await this.userRepository.first(new UserFilter()
+            .whereUsername(command.username));
+        if (!user) throw new AuthError();
 
-        let sessionToken = await this.authDomainService.tryPasswordLogin(user, command.password);
-        if (!sessionToken) {
-            throw new AuthError();
-        }
+        const passwords = await this.userAuthRepository.list(new UserAuthFilter()
+            .whereUserId(user.id)
+            .whereType('password'));
+        if (passwords.length === 0) throw new AuthError();
 
+        let found = false;
+        for (let password of passwords) {
+            console.log(password);
+            if (await bcrypt.compare(command.password, password.details.hash)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) throw new AuthError();
+
+        const salt = randomBytes(16);
+        const secret = randomBytes(16);
+
+        const hash = createHash('sha256');
+        hash.update(secret);
+        hash.update(salt);
+        const hashedSecret = hash.digest();
+
+        const session = {
+            id: v4(),
+            userId: user.id,
+            salt: salt,
+            hashedSecret: hashedSecret
+        };
+        await this.sessionRepository.add(session);
+
+        const sessionToken = formatSessionToken(session.id, secret);
         return new LoginResponse(sessionToken);
     }
+}
+
+function formatSessionToken(id, secret){
+    const buf = Buffer.from(id);
+    const combinedBuffer = Buffer.concat([buf, secret]);
+    return `sessionToken_${combinedBuffer.toString('base64')}`;
 }

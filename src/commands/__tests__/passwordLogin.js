@@ -9,8 +9,8 @@ test('Login user without command', async () => {
 
 test('Login unknown user', async () => {
     // arrange
-    const userService = {
-        findUser: jest.fn(() => null),
+    const userRepo = {
+        first: jest.fn(() => null),
     }
 
     const command = {
@@ -18,7 +18,7 @@ test('Login unknown user', async () => {
         password: "<Password>",
     };
 
-    const handler = new PasswordLoginHandler(userService);
+    const handler = new PasswordLoginHandler(userRepo);
 
     // act
     expect(handler.handle(command)).rejects.toThrow(AuthError)
@@ -26,12 +26,12 @@ test('Login unknown user', async () => {
 
 test('Login wrong password', async () => {
     // arrange
-    const userService = {
-        findUser: jest.fn(() => ({})),
+    const userRepo = {
+        first: jest.fn(() => ({})),
     };
 
-    const authService = {
-        tryPasswordLogin: jest.fn(() => false),
+    const userAuthRepo = {
+        list: jest.fn(() => []),
     };
 
     const command = {
@@ -39,7 +39,7 @@ test('Login wrong password', async () => {
         password: "<Password>",
     };
 
-    const handler = new PasswordLoginHandler(userService, authService);
+    const handler = new PasswordLoginHandler(userRepo, userAuthRepo);
 
     // act
     expect(handler.handle(command)).rejects.toThrow(AuthError)
@@ -47,24 +47,29 @@ test('Login wrong password', async () => {
 
 test('Login correct user and password', async () => {
     // arrange
-    const userService = {
-        findUser: jest.fn(() => ({})),
+    const userRepo = {
+        first: jest.fn(() => ({})),
     };
 
-    const authService = {
-        tryPasswordLogin: jest.fn(() => "session"),
+    const userAuthRepo = {
+        list: jest.fn(() => [{details: {hash: "$2b$12$xof/3FKOl2LCmu7e6Vig8.kKi1hdRNm7YOvdG9I8yGAn8r9lSUHPK"}}]),
+    };
+
+    const sessionRepo = {
+        add: jest.fn(),
     };
 
     const command = {
         username: "UnknownBean",
-        password: "<Password>",
+        password: "secretbean!",
     };
 
-    const handler = new PasswordLoginHandler(userService, authService);
+    const handler = new PasswordLoginHandler(userRepo, userAuthRepo, sessionRepo);
 
     // act
     const response = await handler.handle(command);
 
     // assert
-    expect(response.sessionToken).toStrictEqual("session");
+    expect(response.sessionToken).not.toBe(null);
+    expect(sessionRepo.add).toHaveBeenCalled();
 });

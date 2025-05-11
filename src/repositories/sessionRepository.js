@@ -14,7 +14,7 @@ export class SessionRepository extends SqlRepository {
     }
 
     get insertRowSql() {
-        return '($id, $userId, $salt, $hashedSecret, $validUntil)';
+        return `($id, $userId, $salt, $hashedSecret, now() + interval '7 days')`;
     }
 
     mapToTable(model) {
@@ -23,7 +23,6 @@ export class SessionRepository extends SqlRepository {
             userId: model.userId,
             salt: model.salt,
             hashedSecret: model.hashedSecret,
-            validUntil: model.validUntil,
         };
     }
 
@@ -37,7 +36,6 @@ export class SessionRepository extends SqlRepository {
             userId: row.user_id,
             salt: row.salt,
             hashedSecret: row.hashed_secret,
-            validUntil: row.valid_until,
         };
     }
 

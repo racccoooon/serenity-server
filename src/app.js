@@ -67,8 +67,9 @@ container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
     c.resolve(UserDomainService),
 ));
 container.registerTransient(PasswordLoginHandler, (c) => new PasswordLoginHandler(
-    c.resolve(UserDomainService),
-    c.resolve(AuthDomainService),
+    c.resolve(UserRepository),
+    c.resolve(UserAuthRepository),
+    c.resolve(SessionRepository),
 ));
 container.registerTransient(LogoutHandler, (c) => new LogoutHandler(
     c.resolve(AuthDomainService),
