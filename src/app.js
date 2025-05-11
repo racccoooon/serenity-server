@@ -20,8 +20,14 @@ import {ServerRepository} from "./repositories/serverRepository.js";
 import {loadKeyPair} from "./utils/crypto.js";
 import {CreatePublicTokenCommand, CreatePublicTokenHandler} from "./commands/auth/createPublicToken.js";
 import {perRequestScopeHook} from "./hooks/perRequestScope.js";
+import {LogoutCommand, LogoutHandler} from "./commands/auth/logout.js";
 
 const fastify = Fastify({logger: false});
+// fall-back content type handler
+fastify.addContentTypeParser('*', function (req, payload, done) {
+    // pass empty object to request handler, ignoring body
+    done(null, {})
+})
 
 // Register routes
 fastify.setErrorHandler(errorHandler);
@@ -60,6 +66,9 @@ container.registerTransient(PasswordLoginHandler, (c) => new PasswordLoginHandle
     c.resolve(UserDomainService),
     c.resolve(AuthDomainService),
 ));
+container.registerTransient(LogoutHandler, (c) => new LogoutHandler(
+    c.resolve(AuthDomainService),
+));
 container.registerTransient(CreatePublicTokenHandler, (c) => new CreatePublicTokenHandler(
     c.resolve(UserDomainService),
 ));
@@ -72,6 +81,7 @@ const mediatorBuilder = new MediatorBuilder();
 
 mediatorBuilder.register(RegisterUserCommand, (c) =>  c.resolve(RegisterUserHandler));
 mediatorBuilder.register(PasswordLoginCommand, (c) => c.resolve(PasswordLoginHandler));
+mediatorBuilder.register(LogoutCommand, (c) => c.resolve(LogoutHandler));
 mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublicTokenHandler));
 
 mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));

@@ -27,6 +27,10 @@ export class AuthDomainService {
         this.sessionRepository = sessionRepository;
     }
 
+    async logout(sessionId) {
+        await this.sessionRepository.remove(sessionId.value);
+    }
+
     /**
      *
      * @param {import('../domain/user.js').User} user

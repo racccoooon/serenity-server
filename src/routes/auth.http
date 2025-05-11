@@ -30,6 +30,10 @@ Accept: application/json
     client.global.set('bearer_token', response.headers.valueOf("authorization"));
 %}
 
+### Logout
+POST http://localhost:5680/api/v1/auth/logout
+Authorization: {{bearer_token}}
+
 ### make a public token
 POST http://localhost:5680/api/v1/auth/publicToken
 Content-Type: application/json

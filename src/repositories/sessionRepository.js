@@ -40,4 +40,10 @@ export class SessionRepository {
 
         return null;
     }
+
+    async remove(id) {
+        const tx = await this.dbTransaction.tx();
+        await tx.query(`delete from sessions where id = $1;`,
+            [id]);
+    }
 }

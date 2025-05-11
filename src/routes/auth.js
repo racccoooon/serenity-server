@@ -7,6 +7,7 @@ import {AuthError} from "../errors/authError.js";
 import {authenticateEntity} from "./_httpAuth.js";
 import {CreatePublicTokenCommand} from "../commands/auth/createPublicToken.js";
 import {Mediator} from "../mediator/index.js";
+import {LogoutCommand} from "../commands/auth/logout.js";
 
 extendZodWithOpenApi(z);
 
@@ -67,6 +68,19 @@ export function passwordLogin(fastify) {
         reply.header('authorization', `Bearer ${response.sessionToken}`);
         reply.code(status.NO_CONTENT);
     })
+}
+
+export function logout(fastify) {
+    fastify.post('/api/v1/auth/logout',
+        async (request, reply) => {
+            const entity = await authenticateEntity(request);
+            if (!entity.isLocalUser()) throw new AuthError();
+
+            await request.scope.resolve(Mediator)
+                .send(new LogoutCommand(entity.sessionId))
+
+            reply.code(status.NO_CONTENT);
+        });
 }
 
 const makePublicTokenSchema = z.object({

@@ -2,6 +2,7 @@ import {AuthError} from "../errors/authError.js";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
 import {UserId} from "../domain/user.js";
+import {Session, SessionId} from "../domain/session.js";
 
 export class AuthenticatedEntity {
     constructor(type, id) {
@@ -63,7 +64,9 @@ export async function authenticateEntity(request){
             throw new AuthError();
         }
 
-        return new AuthenticatedEntity('local_user', new UserId(dbSession.userId));
+        const authenticatedEntity = new AuthenticatedEntity('local_user', new UserId(dbSession.userId));
+        authenticatedEntity.sessionId = new SessionId(dbSession.id);
+        return authenticatedEntity;
     }
 
     const signature = headers['x-signature'];

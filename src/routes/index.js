@@ -1,5 +1,5 @@
 import { logger } from '../utils/logger.js';
-import {makePublicToken, passwordLogin, registerUser} from './auth.js';
+import {logout, makePublicToken, passwordLogin, registerUser} from './auth.js';
 import {createServer} from "./servers.js";
 import {getPublicKey} from "./wellKnown.js";
 
@@ -15,6 +15,7 @@ export function routes(fastify, options) {
   // auth routes
   registerUser(fastify);
   passwordLogin(fastify);
+  logout(fastify);
   makePublicToken(fastify);
 
   // server routes
