@@ -3,28 +3,19 @@ import {chunked, isLastIndex} from "../utils/index.js";
 import {Sqlb} from "./_sqlb.js";
 
 export class ServerRepository extends SqlRepository {
-    async add(...servers) {
-        if(servers.length === 0) return;
+    get insertIntoSql() {
+        return 'insert into servers (id, owner_id, name, description)';
+    }
 
-        for (let chunk of chunked(servers)) {
-            const sqlb = new Sqlb('insert into servers (id, owner_id, name, description) values');
-
-            for (let i = 0; i < chunk.length; i++) {
-                const server = chunk[i];
-
-                sqlb.add('($id, $ownerId, $name, $description)', {
-                    id: server.id,
-                    ownerId: server.ownerId,
-                    name: server.name,
-                    description: server.description,
-                });
-
-                if (!isLastIndex(i, chunk)) {
-                    sqlb.add(",");
-                }
+    toTableMapping(model) {
+        return {
+            sql: '($id, $ownerId, $name, $description)',
+            value: {
+                id: model.id,
+                ownerId: model.ownerId,
+                name: model.name,
+                description: model.description,
             }
-
-            await this.execute(sqlb);
-        }
+        };
     }
 }

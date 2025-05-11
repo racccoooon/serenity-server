@@ -12,34 +12,25 @@ export class UserFilter {
 }
 
 export class UserRepository extends SqlRepository {
-    async add(...users) {
-        if (users.length === 0) return;
+    get insertIntoSql() {
+        return 'insert into users (id, username, email)';
+    }
 
-        for (let chunk of chunked(users)) {
-            const sqlb = new Sqlb('insert into users (id, username, email) values');
-
-            for (let i = 0; i < chunk.length; i++) {
-                const user = chunk[i];
-
-                sqlb.add('($id, $username, $email)', {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                });
-
-                if (!isLastIndex(i, chunk)) {
-                    sqlb.add(",");
-                }
+    toTableMapping(model) {
+        return {
+            sql: '($id, $username, $email)',
+            value: {
+                id: model.id,
+                username: model.username,
+                email: model.email,
             }
-
-            await this.execute(sqlb);
-        }
+        };
     }
 
     async first(filter) {
         const sqlb = new Sqlb('select * from users where true');
 
-        if(!!filter.filterId){
+        if (!!filter.filterId) {
             sqlb.add('and id = id', {id: filter.filterId});
         }
 
