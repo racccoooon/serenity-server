@@ -63,6 +63,7 @@ export class SqlRepository {
 
     async first(filter){
         const sqlb = this.buildSelectFromFilter(filter);
+        sqlb.add(`limit 1`);
         const result = await this.execute(sqlb);
         return result.rows.map(this.mapFromTable)[0] ?? null;
     }
