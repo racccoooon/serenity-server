@@ -20,6 +20,8 @@ import {ServerRepository} from "./repositories/serverRepository.js";
 import {loadKeyPair} from "./utils/crypto.js";
 import {CreatePublicTokenCommand, CreatePublicTokenHandler} from "./commands/auth/createPublicToken.js";
 import {perRequestScopeHook} from "./hooks/perRequestScope.js";
+import {cleanupSessions} from "./crons/sessionCleanup.js";
+import cron from 'node-cron';
 import {LogoutCommand, LogoutHandler} from "./commands/auth/logout.js";
 
 const fastify = Fastify({logger: false});
@@ -87,6 +89,8 @@ mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublic
 mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
 
 container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
+
+cron.schedule('0 0 * * *', cleanupSessions);
 
 // Start the server
 const start = async () => {
