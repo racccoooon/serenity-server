@@ -1,20 +1,20 @@
 import { jest } from '@jest/globals';
 import {LogoutCommand, LogoutHandler} from "../logout.js";
-import {SessionId} from "../../../domain/session.js";
+import {v4} from "uuid";
 
 test('calls service', async () => {
     // arrange
-    const authService = {
-        logout: jest.fn(),
+    const sessionRepo = {
+        remove: jest.fn(),
     };
 
-    const command = new LogoutCommand(SessionId.gen());
+    const command = new LogoutCommand(v4());
 
-    const sut = new LogoutHandler(authService);
+    const sut = new LogoutHandler(sessionRepo);
 
     // act
     await sut.handle(command);
 
     // assert
-    expect(authService.logout).toHaveBeenCalled();
+    expect(sessionRepo.remove).toHaveBeenCalled();
 })

@@ -1,6 +1,3 @@
-import {UserDomainService} from "../../services/userDomainService.js";
-import {User, UserName} from "../../domain/user.js";
-import {PasswordAuthentication} from "../../domain/auth.js";
 import {v4} from "uuid";
 import bcrypt from "bcryptjs";
 

@@ -1,11 +1,9 @@
-import {UserSelector} from "../../domain/user.js";
 import {AuthError} from "../../errors/authError.js";
 import {UserFilter} from "../../repositories/userRepository.js";
 import {UserAuthFilter} from "../../repositories/userAuthRepository.js";
 import bcrypt from "bcryptjs";
 import {createHash, randomBytes} from "crypto";
 import {v4} from "uuid";
-import {DateTime} from "luxon";
 
 export class PasswordLoginCommand {
     constructor(username, password) {
@@ -41,7 +39,6 @@ export class PasswordLoginHandler {
 
         let found = false;
         for (let password of passwords) {
-            console.log(password);
             if (await bcrypt.compare(command.password, password.details.hash)) {
                 found = true;
                 break;

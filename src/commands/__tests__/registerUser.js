@@ -1,7 +1,5 @@
 import {RegisterUserHandler} from "../auth/registerUser.js";
 import { jest } from '@jest/globals';
-import {PasswordAuthentication} from "../../domain/auth.js";
-import {User, UserId, UserName} from "../../domain/user.js";
 
 test('Register user without command', async () => {
     const handler = new RegisterUserHandler();

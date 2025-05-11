@@ -1,7 +1,6 @@
 import {z} from 'zod';
 import {status} from "http-status";
 import {CreateServerCommand} from "../commands/server/createServer.js";
-import {UserId} from "../domain/user.js";
 import {authenticateEntity} from "./_httpAuth.js";
 import {AuthError} from "../errors/authError.js";
 import {Mediator} from "../mediator/index.js";
@@ -31,7 +30,7 @@ export function createServer(fastify) {
 
         const server = await request.scope.resolve(Mediator)
             .send(new CreateServerCommand(
-                entity.id.value,
+                entity.id,
                 requestDto.name,
                 requestDto?.description
             ));
@@ -48,7 +47,7 @@ export function getJoinedServers(fastify) {
 
         const response = await request.scope.resolve(Mediator)
             .send(new GetServersOfUserQuery(
-                entity.id.value,
+                entity.id,
             ));
 
         reply.send(response);
