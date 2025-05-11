@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals';
 import {CreateServerHandler} from "../createServer.js";
-import {UserId} from "../../../domain/user.js";
 import {v4} from "uuid";
 
 test('create server', async () => {

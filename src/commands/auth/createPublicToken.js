@@ -1,7 +1,7 @@
 import * as jose from 'jose'
 import {PRIVATE_KEY} from "../../utils/crypto.js";
-import {UserSelector} from "../../domain/user.js";
 import {config} from "../../config/settings.js";
+import {UserFilter} from "../../repositories/userRepository.js";
 
 export class CreatePublicTokenCommand {
     constructor(userId, publicKey) {
@@ -17,8 +17,8 @@ export class CreatePublicTokenResponse {
 }
 
 export class CreatePublicTokenHandler {
-    constructor(userDomainService) {
-        this.userDomainService = userDomainService;
+    constructor(userRepository) {
+        this.userRepository = userRepository;
     }
 
     /**
@@ -28,12 +28,13 @@ export class CreatePublicTokenHandler {
     async handle(command) {
         if (!command) throw new Error('Command must be provided');
 
-        const user = await this.userDomainService.findUser(new UserSelector(command.userId));
+        const user = await this.userRepository.first(new UserFilter()
+            .whereId(command.userId));
 
         const payload = {
             publicKey: command.publicKey,
-            sub: command.userId.value,
-            username: user.username.value,
+            sub: command.userId,
+            username: user.username,
             domain: config.server.domain,
         };
 

@@ -7,6 +7,11 @@ export class UserAuthFilter {
         this.filterUserId = userId;
         return this;
     }
+
+    whereType(type){
+        this.filterType = type;
+        return this;
+    }
 }
 
 export class UserAuthRepository extends SqlRepository {
@@ -38,19 +43,18 @@ export class UserAuthRepository extends SqlRepository {
             sqlb.add('and user_id = $userId', {userId: filter.filterUserId});
         }
 
+        if(!!filter.filterType) {
+            sqlb.add('and type = $type', {type: filter.filterType});
+        }
+
         return sqlb;
     }
 
     mapFromTable(row) {
-        switch (row.type) {
-            case 'password':
-                return {
-                    id: row.id,
-                    type: 'password',
-                    details: {hash: row.details.hash},
-                };
-            default:
-                throw new Error('Unreachable');
-        }
+        return {
+            id: row.id,
+            type: 'password',
+            details: row.details,
+        };
     }
 }

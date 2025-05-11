@@ -5,13 +5,11 @@ import {routes} from './routes/index.js';
 import {DbTransaction, runMigrations} from "./db/index.js";
 import {serializerCompiler, validatorCompiler} from "fastify-zod-openapi";
 import {Container} from "./container/index.js";
-import {UserDomainService} from "./services/userDomainService.js";
 import {UserRepository} from "./repositories/userRepository.js";
 import {UserAuthRepository} from "./repositories/userAuthRepository.js";
 import {Mediator, MediatorBuilder} from "./mediator/index.js";
 import {RegisterUserCommand, RegisterUserHandler} from "./commands/auth/registerUser.js";
 import {SessionRepository} from "./repositories/sessionRepository.js";
-import {AuthDomainService} from "./services/authDomainService.js";
 import {PasswordLoginCommand, PasswordLoginHandler} from "./commands/auth/passwordLogin.js";
 import errorHandler from "./hooks/errorHandler.js";
 import {CreateServerCommand, CreateServerHandler} from "./commands/server/createServer.js";
@@ -42,15 +40,6 @@ fastify.setSerializerCompiler(serializerCompiler);
 
 export const container = new Container();
 
-// services
-container.registerTransient(UserDomainService, (c) => new UserDomainService({
-    userRepository: c.resolve(UserRepository),
-    userAuthRepository: c.resolve(UserAuthRepository),
-}));
-container.registerTransient(AuthDomainService, (c) => new AuthDomainService({
-    sessionRepository: c.resolve(SessionRepository),
-}));
-
 // db stuff
 container.registerScoped(DbTransaction, () => {
     return new DbTransaction();
@@ -64,17 +53,19 @@ container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepos
 
 // commands and queries
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
-    c.resolve(UserDomainService),
+    c.resolve(UserRepository),
+    c.resolve(UserAuthRepository),
 ));
 container.registerTransient(PasswordLoginHandler, (c) => new PasswordLoginHandler(
-    c.resolve(UserDomainService),
-    c.resolve(AuthDomainService),
+    c.resolve(UserRepository),
+    c.resolve(UserAuthRepository),
+    c.resolve(SessionRepository),
 ));
 container.registerTransient(LogoutHandler, (c) => new LogoutHandler(
-    c.resolve(AuthDomainService),
+    c.resolve(SessionRepository),
 ));
 container.registerTransient(CreatePublicTokenHandler, (c) => new CreatePublicTokenHandler(
-    c.resolve(UserDomainService),
+    c.resolve(UserRepository),
 ));
 
 container.registerTransient(CreateServerHandler, (c) => new CreateServerHandler(

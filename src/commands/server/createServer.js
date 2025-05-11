@@ -1,5 +1,3 @@
-import {Server} from "../../domain/server.js";
-import {UserId} from "../../domain/user.js";
 import {v4} from "uuid";
 
 export class CreateServerCommand {

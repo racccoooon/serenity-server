@@ -1,7 +1,5 @@
 import {RegisterUserHandler} from "../auth/registerUser.js";
 import { jest } from '@jest/globals';
-import {PasswordAuthentication} from "../../domain/auth.js";
-import {User, UserId, UserName} from "../../domain/user.js";
 
 test('Register user without command', async () => {
     const handler = new RegisterUserHandler();
@@ -22,13 +20,20 @@ test('Register user', async () => {
         email: '<EMAIL>',
         authenticationMethods: [{ type: 'password', details: { password: '<PASSWORD>' }}]
     };
-    const userService = {createUser: jest.fn()};
-    const handler = new RegisterUserHandler(userService);
+
+    const userRepo = {
+        add: jest.fn(),
+    };
+    const userAuthRepo = {
+        add: jest.fn(),
+    };
+
+    const handler = new RegisterUserHandler(userRepo, userAuthRepo);
 
     // act
     const _ = await handler.handle(command);
 
     // assert
-    expect(userService.createUser).toHaveBeenCalledWith(new User(new UserName('<USER>'), '<EMAIL>')
-        .withAuthentication(await PasswordAuthentication.fromPlain('<PASSWORD>')));
+    expect(userRepo.add).toHaveBeenCalled();
+    expect(userAuthRepo.add).toHaveBeenCalled();
 });

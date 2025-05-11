@@ -1,6 +1,5 @@
-import {UserDomainService} from "../../services/userDomainService.js";
-import {User, UserName} from "../../domain/user.js";
-import {PasswordAuthentication} from "../../domain/auth.js";
+import {v4} from "uuid";
+import bcrypt from "bcryptjs";
 
 export class RegisterUserCommand {
     constructor(username, email, authenticationMethods) {
@@ -17,8 +16,9 @@ export class RegisterUserResponse {
 }
 
 export class RegisterUserHandler {
-    constructor(userDomainService) {
-        this.userDomainService = userDomainService;
+    constructor(userRepository, userAuthRepository) {
+        this.userRepository = userRepository;
+        this.userAuthRepository = userAuthRepository;
     }
 
     /**
@@ -28,15 +28,31 @@ export class RegisterUserHandler {
         if (!command) throw new Error('Command must be provided');
         if (command.authenticationMethods.length === 0) throw new Error('Missing authentication method');
 
-        const user = new User(new UserName(command.username), command.email);
+        const user = {
+            id: v4(),
+            username: command.username,
+            email: command.email
+        };
+        await this.userRepository.add(user);
+
         for (const authenticationMethod of command.authenticationMethods) {
             switch (authenticationMethod.type) {
                 case 'password':
-                    user.withAuthentication(await PasswordAuthentication.fromPlain(authenticationMethod.details.password));
+                    const hash = await bcrypt.hash(authenticationMethod.details.password, 12);
+                    const password = {
+                        id: v4(),
+                        userId: user.id,
+                        type: 'password',
+                        details: {
+                            hash: hash,
+                        }
+                    };
+                    this.userAuthRepository.add(password)
+                    break;
+                default:
+                    throw new Error(`Unsupported authentication method '${authenticationMethod.type}'`);
             }
         }
-
-        await this.userDomainService.createUser(user);
 
         return new RegisterUserResponse(user.id);
     };

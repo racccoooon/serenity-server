@@ -1,13 +1,13 @@
 import {GetServersOfUserHandler, GetServersOfUserQuery} from "../getServersOfUser.js";
-import {UserId} from "../../../domain/user.js";
 import { jest } from '@jest/globals';
+import {v4} from "uuid";
 
 test('no servers found', async () => {
     // arrange
     const serverRepo = {
         list: jest.fn(() => []),
     };
-    const command = new GetServersOfUserQuery(UserId.gen())
+    const command = new GetServersOfUserQuery(v4())
     const sut = new GetServersOfUserHandler(serverRepo);
 
     // act
@@ -23,7 +23,7 @@ test('servers found', async () => {
     const serverRepo = {
         list: jest.fn(() => [{}]),
     };
-    const query = new GetServersOfUserQuery(UserId.gen())
+    const query = new GetServersOfUserQuery(v4())
     const sut = new GetServersOfUserHandler(serverRepo);
 
     // act

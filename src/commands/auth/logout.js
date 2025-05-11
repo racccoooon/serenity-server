@@ -1,15 +1,14 @@
-import {SessionId} from "../../domain/session.js";
+import {SessionFilter} from "../../repositories/sessionRepository.js";
 
 export class LogoutCommand {
     constructor(sessionId) {
-        if (!(sessionId instanceof SessionId)) throw new Error("Session id has to be a SessionId");
         this.sessionId = sessionId;
     }
 }
 
 export class LogoutHandler {
-    constructor(authDomainService) {
-        this.authDomainService = authDomainService;
+    constructor(sessionRepository) {
+        this.sessionRepository = sessionRepository;
     }
 
     /**
@@ -19,6 +18,7 @@ export class LogoutHandler {
     async handle(command) {
         if (!command) throw new Error('Command must be provided');
 
-        await this.authDomainService.logout(command.sessionId);
+        await this.sessionRepository.remove(new SessionFilter()
+            .whereId(command.sessionId));
     }
 }
