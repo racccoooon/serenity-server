@@ -1,7 +1,7 @@
 import {UserId, UserName} from "../domain/user.js";
 import {logger} from "../utils/logger.js";
 import {Sqlb} from "./_sqlb.js";
-import {SqlRepository} from "./Repository.js";
+import {SqlRepository} from "./_sqlRepository.js";
 import {chunked, isLastIndex} from "../utils/index.js";
 
 export class UserFilter {

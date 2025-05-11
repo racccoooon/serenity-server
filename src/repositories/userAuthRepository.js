@@ -1,6 +1,6 @@
 import {logger} from "../utils/logger.js";
 import {Sqlb} from "./_sqlb.js";
-import {SqlRepository} from "./Repository.js";
+import {SqlRepository} from "./_sqlRepository.js";
 
 export class UserAuthRepository extends SqlRepository{
     get insertIntoSql() {

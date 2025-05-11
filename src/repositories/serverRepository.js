@@ -1,4 +1,4 @@
-import {SqlRepository} from "./Repository.js";
+import {SqlRepository} from "./_sqlRepository.js";
 
 export class ServerRepository extends SqlRepository {
     get insertIntoSql() {
