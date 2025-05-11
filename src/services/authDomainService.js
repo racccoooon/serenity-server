@@ -19,6 +19,7 @@ export function createSessionRequestModel(session) {
     model.userId = session.userId.value;
     model.salt = session.salt;
     model.hashedSecret = session.hashedSecret;
+    model.validUntil = session.validUntil;
     return model;
 }
 
