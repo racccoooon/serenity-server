@@ -1,7 +1,6 @@
-import {ServerModel} from "../repositories/serverRepository.js";
 
 export function createServerModel(server) {
-    const model = new ServerModel();
+    const model = {};
     model.id = server.id.value;
     model.ownerId = server.ownerId.value;
     model.name = server.name;

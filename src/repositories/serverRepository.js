@@ -1,26 +1,30 @@
-export class ServerModel {
-    constructor(id, ownerId, name, description) {
-        this.id = id;
-        this.ownerId = ownerId;
-        this.name = name;
-        this.description = description;
-    }
-}
+import {SqlRepository} from "./Repository.js";
+import {chunked, isLastIndex} from "../utils/index.js";
+import {Sqlb} from "./_sqlb.js";
 
-export class ServerRepository {
-    constructor(dbTransaction) {
-        this.dbTransaction = dbTransaction;
-    }
+export class ServerRepository extends SqlRepository {
+    async add(...servers) {
+        if(servers.length === 0) return;
 
-    /**
-     * @param {ServerModel} model
-     * @returns {Promise<void>}
-     */
-    async add(model) {
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`
-                    insert into servers (id, owner_id, name, description)
-                    values ($1, $2, $3, $4);`,
-            [model.id, model.ownerId, model.name, model.description]);
+        for (let chunk of chunked(servers)) {
+            const sqlb = new Sqlb('insert into servers (id, owner_id, name, description) values');
+
+            for (let i = 0; i < chunk.length; i++) {
+                const server = chunk[i];
+
+                sqlb.add('($id, $ownerId, $name, $description)', {
+                    id: server.id,
+                    ownerId: server.ownerId,
+                    name: server.name,
+                    description: server.description,
+                });
+
+                if (!isLastIndex(i, chunk)) {
+                    sqlb.add(",");
+                }
+            }
+
+            await this.execute(sqlb);
+        }
     }
 }
