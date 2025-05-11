@@ -1,6 +1,8 @@
 import winston from 'winston';
 import { config } from '../config/settings.js';
 
+const SPLAT = Symbol.for('splat')
+
 const logger = winston.createLogger({
   level: config.logLevel,
   format: winston.format.combine(
@@ -8,8 +10,12 @@ const logger = winston.createLogger({
     winston.format.timestamp({
       format: 'HH:mm:ss'
     }),
-    winston.format.printf(({ level, message, timestamp }) => {
-      return `${timestamp} ${level}: ${message}`;
+    winston.format.printf(({ timestamp, level, message, [SPLAT]:splat}) => {
+      let msg = `${timestamp} ${level}: ${message}`;
+      if(splat){
+         msg += ' ' + JSON.stringify(splat);
+      }
+      return msg;
     })
   ),
   transports: [
