@@ -1,28 +1,21 @@
-export class SessionModel {
-    constructor(id, userId, salt, hashedSecret, validUntil) {
-        this.id = id;
-        this.userId = userId;
-        this.salt = salt;
-        this.hashedSecret = hashedSecret;
-        this.validUntil = validUntil;
-    }
-}
+import {SqlRepository} from "./Repository.js";
 
-export class SessionRepository {
-    constructor(dbTransaction) {
-        this.dbTransaction = dbTransaction;
+export class SessionRepository extends SqlRepository {
+    get insertIntoSql() {
+        return 'insert into sessions (id, user_id, salt, hashed_secret, valid_until)';
     }
 
-    /**
-     * @param {SessionModel} param
-     * @returns {Promise<void>}
-     */
-    async add(param) {
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`
-            insert into sessions(id, user_id, salt, hashed_secret, valid_until)
-            values ($1, $2, $3, $4, $5);`,
-            [param.id, param.userId, param.salt, param.hashedSecret, param.validUntil]);
+    toTableMapping(model) {
+        return {
+            sql: '($id, $userId, $salt, $hashedSecret, $validUntil)',
+            value: {
+                id: model.id,
+                userId: model.userId,
+                salt: model.salt,
+                hashedSecret: model.hashedSecret,
+                validUntil: model.validUntil,
+            }
+        };
     }
 
     async updateUsageAndValidUntil(id, lastUsed, validUntil){
@@ -41,13 +34,13 @@ export class SessionRepository {
                     where id = $1`,
             [id]);
 
-        const sessions = result.rows.map(row => new SessionModel(
-            row.id,
-            row.user_id,
-            row.salt,
-            row.hashed_secret,
-            row.valid_until,
-        ));
+        const sessions = result.rows.map(row => ({
+            id: row.id,
+            userId: row.user_id,
+            salt: row.salt,
+            hashedSecret: row.hashed_secret,
+            validUntil: row.valid_until,
+        }));
 
         if(sessions.length === 1){
             return sessions[0];

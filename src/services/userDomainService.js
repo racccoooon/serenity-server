@@ -77,8 +77,6 @@ export class UserDomainService {
             return null;
         }
 
-        console.log(userModel);
-
         const user = new User(
             new UserName(userModel.username),
             userModel.email,

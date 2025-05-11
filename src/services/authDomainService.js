@@ -1,5 +1,4 @@
 import {AuthType} from "../domain/auth.js";
-import {SessionModel} from "../repositories/sessionRepository.js";
 import {Session} from "../domain/session.js";
 
 export function formatSessionToken(id, secret){
@@ -11,10 +10,9 @@ export function formatSessionToken(id, secret){
 /**
  *
  * @param {Session} session
- * @returns {SessionModel}
  */
 export function createSessionRequestModel(session) {
-    const model = new SessionModel();
+    const model = {};
     model.id = session.id.value;
     model.userId = session.userId.value;
     model.salt = session.salt;
