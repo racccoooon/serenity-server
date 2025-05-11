@@ -25,6 +25,15 @@ export class SessionRepository {
             [param.id, param.userId, param.salt, param.hashedSecret, param.validUntil]);
     }
 
+    async updateUsageAndValidUntil(id, lastUsed, validUntil){
+        const tx = await this.dbTransaction.tx();
+        await tx.query(`
+            update sessions
+            set last_used = $2, valid_until = $3
+            where id = $1`,
+            [id, lastUsed, validUntil]);
+    }
+
     async find(id) {
         const tx = await this.dbTransaction.tx();
         const result = await tx.query(`select id, user_id, salt, hashed_secret, valid_until
