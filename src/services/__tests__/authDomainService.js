@@ -1,10 +1,11 @@
 import {AuthDomainService, createSessionRequestModel} from "../authDomainService.js";
 import {PasswordAuthentication} from "../../domain/auth.js";
 import {UserId} from "../../domain/user.js";
-import { jest } from '@jest/globals';
+import {jest} from '@jest/globals';
 import {createUserRequestModel} from "../userDomainService.js";
+import {SessionId} from "../../domain/session.js";
 
-test('user without password', async () => {
+test('login user without password', async () => {
     const user = {
         authenticationMethods: [],
     };
@@ -13,7 +14,7 @@ test('user without password', async () => {
     expect(sessionToken).toBe(null);
 });
 
-test('user with wrong password', async () => {
+test('login user with wrong password', async () => {
     const user = {
         authenticationMethods: [
             await PasswordAuthentication.fromPlain("bar"),
@@ -24,7 +25,7 @@ test('user with wrong password', async () => {
     expect(sessionToken).toBe(null);
 });
 
-test('user with correct password issues a session token', async () => {
+test('login user with correct password issues a session token', async () => {
     // arrange
     const user = {
         id: UserId.gen(),
@@ -45,4 +46,19 @@ test('user with correct password issues a session token', async () => {
     // assert
     expect(sessionToken).not.toBe(null);
     expect(sessionRepository.add).toHaveBeenCalled();
+});
+
+test('logout', async () => {
+    // arrange
+    const sessionRepository = {
+        remove: jest.fn(),
+    };
+
+    const authService = new AuthDomainService({sessionRepository})
+
+    // act
+    await authService.logout(SessionId.gen());
+
+    // assert
+    expect(sessionRepository.remove).toHaveBeenCalled();
 });
