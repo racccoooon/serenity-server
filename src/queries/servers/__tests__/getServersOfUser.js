@@ -21,7 +21,7 @@ test('no servers found', async () => {
 test('servers found', async () => {
     // arrange
     const serverRepo = {
-        list: jest.fn(),
+        list: jest.fn(() => [{}]),
     };
     const query = new GetServersOfUserQuery(UserId.gen())
     const sut = new GetServersOfUserHandler(serverRepo);
@@ -31,4 +31,5 @@ test('servers found', async () => {
 
     // assert
     expect(serverRepo.list).toHaveBeenCalled();
+    expect(response.length).toBe(1);
 });
