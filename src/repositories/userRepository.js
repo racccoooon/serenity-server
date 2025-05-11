@@ -1,6 +1,8 @@
 import {UserId, UserName} from "../domain/user.js";
 import {logger} from "../utils/logger.js";
 import {Sqlb} from "./_sqlb.js";
+import {SqlRepository} from "./Repository.js";
+import {chunked, isLastIndex} from "../utils/index.js";
 
 export class UserModel {
     constructor(id, username, email) {
@@ -10,25 +12,39 @@ export class UserModel {
     }
 }
 
-export class UserRepository {
-    constructor(dbTransaction) {
-        this.dbTransaction = dbTransaction;
-    }
+export class UserRepository extends SqlRepository {
+    async add(...users) {
+        if (users.length === 0) return;
 
-    async add(param) {
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`
-            insert into users (id, username, email)
-            values ($1, $2, $3);`,
-            [param.id, param.username, param.email]);
+        for (let chunk of chunked(users)) {
+            const sqlb = new Sqlb('insert into users (id, username, email) values');
+
+            for (let i = 0; i < chunk.length; i++) {
+                const user = chunk[i];
+
+                sqlb.add('($id, $username, $email)', {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                });
+
+                if (!isLastIndex(i, chunk)) {
+                    sqlb.add(",");
+                }
+            }
+
+            await this.execute(sqlb);
+        }
     }
 
     async find(selector) {
         let sqlb = new Sqlb(
-            `select id, username, email from users where`
+            `select id, username, email
+             from users
+             where`
         );
 
-        switch (true){
+        switch (true) {
             case selector.value instanceof UserId:
                 sqlb.add('id = $id', {id: selector.value.value});
                 break;
