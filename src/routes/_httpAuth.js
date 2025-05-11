@@ -72,8 +72,8 @@ export async function authenticateEntity(request){
         const now = DateTime.now();
         await sessionRepo.updateUsageAndValidUntil(
             sessionId,
-            now.toJSDate(),
-            now.plus({days: 7}).toJSDate());
+            now,
+            now.plus({days: 7}));
 
         const authenticatedEntity = new AuthenticatedEntity('local_user', new UserId(dbSession.userId));
         authenticatedEntity.sessionId = new SessionId(dbSession.id);
