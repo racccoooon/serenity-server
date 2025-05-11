@@ -64,7 +64,8 @@ container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepos
 
 // commands and queries
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
-    c.resolve(UserDomainService),
+    c.resolve(UserRepository),
+    c.resolve(UserAuthRepository),
 ));
 container.registerTransient(PasswordLoginHandler, (c) => new PasswordLoginHandler(
     c.resolve(UserRepository),
