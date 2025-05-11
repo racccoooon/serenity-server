@@ -16,14 +16,15 @@ export class UserRepository extends SqlRepository {
         return 'insert into users (id, username, email)';
     }
 
-    toTableMapping(model) {
+    get insertRowSql() {
+        return '($id, $username, $email)';
+    }
+
+    mapToTable(model) {
         return {
-            sql: '($id, $username, $email)',
-            value: {
-                id: model.id,
-                username: model.username,
-                email: model.email,
-            }
+            id: model.id,
+            username: model.username,
+            email: model.email,
         };
     }
 

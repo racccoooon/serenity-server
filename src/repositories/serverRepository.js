@@ -7,15 +7,16 @@ export class ServerRepository extends SqlRepository {
         return 'insert into servers (id, owner_id, name, description)';
     }
 
-    toTableMapping(model) {
+    get insertRowSql() {
+        return '($id, $ownerId, $name, $description)';
+    }
+
+    mapToTable(model) {
         return {
-            sql: '($id, $ownerId, $name, $description)',
-            value: {
-                id: model.id,
-                ownerId: model.ownerId,
-                name: model.name,
-                description: model.description,
-            }
+            id: model.id,
+            ownerId: model.ownerId,
+            name: model.name,
+            description: model.description,
         };
     }
 }
