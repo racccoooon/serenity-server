@@ -2,6 +2,7 @@ import {AuthError} from "../errors/authError.js";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
 import {UserId} from "../domain/user.js";
+import {DateTime} from "luxon";
 import {Session, SessionId} from "../domain/session.js";
 
 export class AuthenticatedEntity {
@@ -52,6 +53,10 @@ export async function authenticateEntity(request){
         const sessionRepo = scope.resolve(SessionRepository);
         const dbSession = await sessionRepo.find(sessionId);
         if(!dbSession){
+            throw new AuthError();
+        }
+
+        if(DateTime.fromJSDate(dbSession.validUntil) < DateTime.now()){
             throw new AuthError();
         }
 
