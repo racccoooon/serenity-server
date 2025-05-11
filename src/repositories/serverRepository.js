@@ -30,7 +30,7 @@ export class ServerRepository extends SqlRepository {
         sqlb.add('where true');
 
         if (!!filter.filterIsMember) {
-            sqlb.add(`and exists (select true from server_members where server_id = servers.id and user_id = $userId)`, {userId: filter.filterId});
+            sqlb.add(`and exists (select true from server_members where server_id = servers.id and user_id = $userId)`, {userId: filter.filterIsMember});
         }
 
         return sqlb;
@@ -38,5 +38,18 @@ export class ServerRepository extends SqlRepository {
 
     buildSelectFromFilter(filter) {
         return this.sqlWithWhereClause(new Sqlb('select * from servers'), filter);
+    }
+
+    mapFromTable(row) {
+        return {
+            id: row.id,
+            ownerId: row.owner_id,
+            name: row.name,
+            description: row.description,
+        };
+    }
+
+    buildDeteFromFilter(filter) {
+        return this.sqlWithWhereClause(new Sqlb(`delete from servers`), filter);
     }
 }

@@ -1,6 +1,7 @@
 import {logger} from "../utils/logger.js";
 import {chunked, isLastIndex} from "../utils/index.js";
 import {Sqlb} from "./_sqlb.js";
+import {config} from "../config/settings.js";
 
 export class SqlRepository {
     constructor(dbTransaction) {
@@ -9,22 +10,28 @@ export class SqlRepository {
 
     async execute(sqlb) {
         const {sql, params} = sqlb.build();
-        logger.debug('Executing sql', sql);
+
+        const meta = {sql: sql};
+        if(config.logPii){
+            meta.params = params;
+        }
+
+        logger.debug('Executing sql', meta);
 
         const tx = await this.dbTransaction.tx();
         return tx.query(sql, params);
     }
 
     get insertIntoSql() {
-        throw new Error(`'insertIntoSql' must be overridden in child class ${this.constructor.name}.`);
+        throw new Error(`'insertIntoSql' must be overridden in child class.`);
     }
 
     get insertRowSql() {
-        throw new Error(`'insertRowSql' must be overridden in child class ${this.constructor.name}.`);
+        throw new Error(`'insertRowSql' must be overridden in child class.`);
     }
 
     mapToTable(model) {
-        throw new Error(`'mapToTable' must be overridden in child class ${this.constructor.name}.`);
+        throw new Error(`'mapToTable' must be overridden in child class.`);
     }
 
     async add(...models) {
@@ -47,11 +54,11 @@ export class SqlRepository {
     }
 
     buildSelectFromFilter(filter){
-        throw new Error(`'buildSelectFromFilter' must be overridden in child class ${this.constructor.name}.`);
+        throw new Error(`'buildSelectFromFilter' must be overridden in child class.`);
     }
 
     mapFromTable(row) {
-        throw new Error(`'mapFromTable' must be overridden in child class ${this.constructor.name}.`);
+        throw new Error(`'mapFromTable' must be overridden in child class.`);
     }
 
     async first(filter){
@@ -67,7 +74,7 @@ export class SqlRepository {
     }
 
     buildDeteFromFilter(filter){
-        throw new Error(`'buildDeteFromFilter' must be overridden in child class ${this.constructor.name}.`);
+        throw new Error(`'buildDeteFromFilter' must be overridden in child class.`);
     }
 
     async remove(filter) {

@@ -14,6 +14,7 @@ export const config = {
         database: process.env.POSTGRES_DB || 'serenity'
     },
     logLevel: process.env.LOG_LEVEL || 'info',
+    logPii: process.env.LOG_PII || true,
     keyPair: {
         privateKeyPath: process.env.PRIV_KEY_PATH || './private.pem',
         pubKeyPath: process.env.PUB_KEY_PATH || './public.pem',

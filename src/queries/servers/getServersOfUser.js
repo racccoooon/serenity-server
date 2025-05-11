@@ -1,5 +1,3 @@
-import {UserId} from "../../domain/user.js";
-import {ServerMemberFilter} from "../../repositories/serverMemberRepository.js";
 import {ServerFilter} from "../../repositories/serverRepository.js";
 
 export class GetServersOfUserQuery{
@@ -20,9 +18,7 @@ export class GetServersOfUserHandler{
     async handle(command) {
         if(!command) throw new Error('Command must be provided');
 
-        const res = await this.serverRepository.list(new ServerFilter()
+        return await this.serverRepository.list(new ServerFilter()
             .whereIsMember(command.userId));
-        console.log(res)
-        return res;
     }
 }
