@@ -1,4 +1,12 @@
 import {SqlRepository} from "./_sqlRepository.js";
+import {Sqlb} from "./_sqlb.js";
+
+export class SessionFilter {
+    whereId(id){
+        this.filterId = id;
+        return this;
+    }
+}
 
 export class SessionRepository extends SqlRepository {
     get insertIntoSql() {
@@ -29,26 +37,23 @@ export class SessionRepository extends SqlRepository {
             [id, lastUsed, validUntil]);
     }
 
-    async find(id) {
-        const tx = await this.dbTransaction.tx();
-        const result = await tx.query(`select id, user_id, salt, hashed_secret, valid_until
-                                       from sessions
-                                       where id = $1`,
-            [id]);
+    async first(filter) {
+        const sqlb = new Sqlb('select * from sessions where true');
 
-        const sessions = result.rows.map(row => ({
+        if(!!filter.filterId){
+            sqlb.add('and id = $id', {id: filter.filterId});
+        }
+
+        sqlb.add('limit 1');
+
+        const result = await this.execute(sqlb);
+        return result.rows.map(row => ({
             id: row.id,
             userId: row.user_id,
             salt: row.salt,
             hashedSecret: row.hashed_secret,
             validUntil: row.valid_until,
-        }));
-
-        if (sessions.length === 1) {
-            return sessions[0];
-        }
-
-        return null;
+        }))[0] ?? null;
     }
 
     async remove(id) {
