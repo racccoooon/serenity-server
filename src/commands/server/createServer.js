@@ -1,5 +1,6 @@
 import {Server} from "../../domain/server.js";
 import {UserId} from "../../domain/user.js";
+import {v4} from "uuid";
 
 export class CreateServerCommand {
     constructor(ownerId, name, description) {
@@ -16,8 +17,9 @@ export class CreateServerResponse{
 }
 
 export class CreateServerHandler {
-    constructor(serverDomainService) {
+    constructor(serverDomainService, serverMemberRepository) {
         this.serverDomainService = serverDomainService;
+        this.serverMemberRepository = serverMemberRepository;
     }
 
     /**
@@ -30,6 +32,11 @@ export class CreateServerHandler {
         const server = new Server(command.ownerId, command.name, command.description);
 
         await this.serverDomainService.createServer(server);
+        await this.serverMemberRepository.add({
+            id: v4(),
+            userId: command.ownerId.value,
+            serverId: server.id.value,
+        })
 
         return new CreateServerResponse(server.id);
     }

@@ -23,6 +23,7 @@ import {perRequestScopeHook} from "./hooks/perRequestScope.js";
 import {cleanupSessions} from "./crons/sessionCleanup.js";
 import cron from 'node-cron';
 import {LogoutCommand, LogoutHandler} from "./commands/auth/logout.js";
+import {ServerMemberRepository} from "./repositories/serverMemberRepository.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -41,6 +42,7 @@ fastify.setSerializerCompiler(serializerCompiler);
 
 export const container = new Container();
 
+// services
 container.registerTransient(UserDomainService, (c) => new UserDomainService({
     userRepository: c.resolve(UserRepository),
     userAuthRepository: c.resolve(UserAuthRepository),
@@ -52,6 +54,7 @@ container.registerTransient(ServerDomainService, (c) => new ServerDomainService(
     serverRepository: c.resolve(ServerRepository),
 }));
 
+// db stuff
 container.registerScoped(DbTransaction, () => {
     return new DbTransaction();
 });
@@ -60,7 +63,9 @@ container.registerTransient(UserRepository, (c) => new UserRepository(c.resolve(
 container.registerTransient(UserAuthRepository, (c) => new UserAuthRepository(c.resolve(DbTransaction)));
 container.registerTransient(SessionRepository, (c) => new SessionRepository(c.resolve(DbTransaction)));
 container.registerTransient(ServerRepository, (c) => new ServerRepository(c.resolve(DbTransaction)));
+container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepository(c.resolve(DbTransaction)));
 
+// commands
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
     c.resolve(UserDomainService),
 ));
@@ -77,6 +82,7 @@ container.registerTransient(CreatePublicTokenHandler, (c) => new CreatePublicTok
 
 container.registerTransient(CreateServerHandler, (c) => new CreateServerHandler(
     c.resolve(ServerDomainService),
+    c.resolve(ServerMemberRepository),
 ));
 
 const mediatorBuilder = new MediatorBuilder();
