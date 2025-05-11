@@ -8,3 +8,8 @@ Authorization: {{bearer_token}}
   "name": "Bean Server",
   "description": "A beanly server for beanly beans"
 }
+
+### List all joined servers
+GET http://localhost:5680/api/v1/servers
+Accept: application/json
+Authorization: {{bearer_token}}

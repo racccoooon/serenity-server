@@ -15,7 +15,6 @@ import {AuthDomainService} from "./services/authDomainService.js";
 import {PasswordLoginCommand, PasswordLoginHandler} from "./commands/auth/passwordLogin.js";
 import errorHandler from "./hooks/errorHandler.js";
 import {CreateServerCommand, CreateServerHandler} from "./commands/server/createServer.js";
-import {ServerDomainService} from "./services/serverDomainService.js";
 import {ServerRepository} from "./repositories/serverRepository.js";
 import {loadKeyPair} from "./utils/crypto.js";
 import {CreatePublicTokenCommand, CreatePublicTokenHandler} from "./commands/auth/createPublicToken.js";
@@ -24,6 +23,7 @@ import {cleanupSessions} from "./crons/sessionCleanup.js";
 import cron from 'node-cron';
 import {LogoutCommand, LogoutHandler} from "./commands/auth/logout.js";
 import {ServerMemberRepository} from "./repositories/serverMemberRepository.js";
+import {GetServersOfUserHandler, GetServersOfUserQuery} from "./queries/servers/getServersOfUser.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -50,9 +50,6 @@ container.registerTransient(UserDomainService, (c) => new UserDomainService({
 container.registerTransient(AuthDomainService, (c) => new AuthDomainService({
     sessionRepository: c.resolve(SessionRepository),
 }));
-container.registerTransient(ServerDomainService, (c) => new ServerDomainService({
-    serverRepository: c.resolve(ServerRepository),
-}));
 
 // db stuff
 container.registerScoped(DbTransaction, () => {
@@ -65,7 +62,7 @@ container.registerTransient(SessionRepository, (c) => new SessionRepository(c.re
 container.registerTransient(ServerRepository, (c) => new ServerRepository(c.resolve(DbTransaction)));
 container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepository(c.resolve(DbTransaction)));
 
-// commands
+// commands and queries
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
     c.resolve(UserDomainService),
 ));
@@ -81,8 +78,11 @@ container.registerTransient(CreatePublicTokenHandler, (c) => new CreatePublicTok
 ));
 
 container.registerTransient(CreateServerHandler, (c) => new CreateServerHandler(
-    c.resolve(ServerDomainService),
+    c.resolve(ServerRepository),
     c.resolve(ServerMemberRepository),
+));
+container.registerTransient(GetServersOfUserHandler, (c) => new GetServersOfUserHandler(
+    c.resolve(ServerRepository),
 ));
 
 const mediatorBuilder = new MediatorBuilder();
@@ -93,6 +93,7 @@ mediatorBuilder.register(LogoutCommand, (c) => c.resolve(LogoutHandler));
 mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublicTokenHandler));
 
 mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
+mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUserHandler));
 
 container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
 

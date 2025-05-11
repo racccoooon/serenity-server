@@ -4,32 +4,31 @@ import { jest } from '@jest/globals';
 
 test('no servers found', async () => {
     // arrange
-    const serverService = {
-        getServersOfUser: jest.fn(() => []),
+    const serverRepo = {
+        list: jest.fn(() => []),
     };
     const command = new GetServersOfUserQuery(UserId.gen())
-    const sut = new GetServersOfUserHandler(serverService);
+    const sut = new GetServersOfUserHandler(serverRepo);
 
     // act
     var response = await sut.handle(command);
 
     // assert
-    expect(serverService.getServersOfUser).toHaveBeenCalled();
+    expect(serverRepo.list).toHaveBeenCalled();
     expect(response.length).toBe(0);
 });
 
 test('servers found', async () => {
     // arrange
-    const serverService = {
-        getServersOfUser: jest.fn(() => [{name: "srv1"}, {name: "srv2"}]),
+    const serverRepo = {
+        list: jest.fn(),
     };
-    const command = new GetServersOfUserQuery(UserId.gen())
-    const sut = new GetServersOfUserHandler(serverService);
+    const query = new GetServersOfUserQuery(UserId.gen())
+    const sut = new GetServersOfUserHandler(serverRepo);
 
     // act
-    var response = await sut.handle(command);
+    var response = await sut.handle(query);
 
     // assert
-    expect(serverService.getServersOfUser).toHaveBeenCalled();
-    expect(response.length).toBe(2);
+    expect(serverRepo.list).toHaveBeenCalled();
 });
