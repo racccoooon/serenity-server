@@ -39,3 +39,15 @@ export function createServer(fastify) {
             .send(new CreateServerResponse(response.id.value));
     });
 }
+
+export function getServers(fastify) {
+    fastify.get('/api/v1/servers', async (request, reply) => {
+        const entity = await authenticateEntity(request);
+        if (!entity.isLocalUser()) throw new AuthError();
+
+        const response = await request.scope.resolve(Mediator)
+            .send(new GetServersOfUserQuery(
+                entity.id,
+            ));
+    });
+}

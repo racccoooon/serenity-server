@@ -21,4 +21,14 @@ export class ServerDomainService{
     async createServer(server){
         await this.serverRepository.add(createServerModel(server))
     }
+
+    /**
+     * @param {import('../domain/user.js').UserId} userId
+     * @returns {Promise<import('../domain/server.js').Server>}
+     */
+    async getServersOfUser(userId){
+        return await this.serverRepository
+            .whereUserId(userId)
+            .toPaged();
+    }
 }
