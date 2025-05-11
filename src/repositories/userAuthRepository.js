@@ -1,30 +1,8 @@
 import {logger} from "../utils/logger.js";
 import {Sqlb} from "./_sqlb.js";
+import {SqlRepository} from "./Repository.js";
 
-export class AuthMethodModel {
-    constructor(id, type, details) {
-        this.id = id;
-        this.type = type;
-        this.details = details;
-    }
-}
-
-export class PasswordAuthDetailsModel {
-    constructor(hash) {
-        this.hash = hash;
-    }
-}
-
-export class UserAuthRepository {
-    constructor(dbTransaction) {
-        this.dbTransaction = dbTransaction;
-    }
-
-    /**
-     * @param {import('../domain/user.js').UserId} userId
-     * @param {AuthMethodModel} authMethod
-     * @returns {Promise<void>}
-     */
+export class UserAuthRepository extends SqlRepository{
     async addPassword(userId, authMethod) {
         const tx = await this.dbTransaction.tx();
         await tx.query(`
@@ -53,11 +31,11 @@ export class UserAuthRepository {
         return result.rows.map(row => {
             switch (row.type) {
                 case 'password':
-                    return new AuthMethodModel(
-                        row.id,
-                        'password',
-                        new PasswordAuthDetailsModel(row.details.hash)
-                    );
+                    return {
+                        id: row.id,
+                        type: 'password',
+                        details: {hash: row.details.hash},
+                    };
                 default:
                     throw new Error('Unreachable');
             }

@@ -1,6 +1,5 @@
 import {AuthType, PasswordAuthentication} from "../domain/auth.js";
 import {UserFilter} from "../repositories/userRepository.js";
-import {AuthMethodModel, PasswordAuthDetailsModel} from "../repositories/userAuthRepository.js";
 import {User, UserId, UserName, UserSelector} from "../domain/user.js";
 
 /**
@@ -15,20 +14,15 @@ export function createUserRequestModel(user)
     return model;
 }
 
-/**
- * @param {import('../domain/user.js').UserId} userId
- * @param {import('../domain/auth.js').AuthenticationMethod} method
- * @returns {AuthMethodModel}
- */
 export function createPasswordRequestModel(method)
 {
     if (method.type !== AuthType.PASSWORD) {
         throw new Error('Invalid authentication type, expected type password');
     }
 
-    const model = new AuthMethodModel();
+    const model = {};
     model.id = method.id;
-    model.details = new PasswordAuthDetailsModel(method.passwordHash);
+    model.details = {passwordHash: method.passwordHash};
     return model;
 }
 

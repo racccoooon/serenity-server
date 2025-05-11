@@ -1,6 +1,4 @@
 import {SqlRepository} from "./Repository.js";
-import {chunked, isLastIndex} from "../utils/index.js";
-import {Sqlb} from "./_sqlb.js";
 
 export class ServerRepository extends SqlRepository {
     get insertIntoSql() {
