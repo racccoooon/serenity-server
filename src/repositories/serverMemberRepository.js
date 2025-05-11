@@ -45,7 +45,7 @@ export class ServerMemberRepository extends SqlRepository {
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`select * form server_members`), filter);
+        return this.sqlWithWhereClause(new Sqlb(`select * from server_members`), filter);
     }
 
     mapFromTable(row) {
@@ -56,7 +56,7 @@ export class ServerMemberRepository extends SqlRepository {
         };
     }
 
-    buildDeteFromFilter(filter) {
+    buildDeleteFromFilter(filter) {
         return this.sqlWithWhereClause(new Sqlb(`delete from server_members`), filter);
     }
 }

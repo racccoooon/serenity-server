@@ -49,7 +49,7 @@ export class ServerRepository extends SqlRepository {
         };
     }
 
-    buildDeteFromFilter(filter) {
+    buildDeleteFromFilter(filter) {
         return this.sqlWithWhereClause(new Sqlb(`delete from servers`), filter);
     }
 }

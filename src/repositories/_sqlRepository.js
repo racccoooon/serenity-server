@@ -74,12 +74,12 @@ export class SqlRepository {
         return result.rows.map(this.mapFromTable);
     }
 
-    buildDeteFromFilter(filter){
-        throw new Error(`'buildDeteFromFilter' must be overridden in child class.`);
+    buildDeleteFromFilter(filter){
+        throw new Error(`'buildDeleteFromFilter' must be overridden in child class.`);
     }
 
     async remove(filter) {
-        const sqlb = this.buildDeteFromFilter(filter);
+        const sqlb = this.buildDeleteFromFilter(filter);
         const result = await this.execute(sqlb);
         return result.rowCount;
     }

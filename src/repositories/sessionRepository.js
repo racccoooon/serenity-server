@@ -41,7 +41,7 @@ export class SessionRepository extends SqlRepository {
         };
     }
 
-    buildDeteFromFilter(filter) {
+    buildDeleteFromFilter(filter) {
         return this.sqlWithWhereClause(new Sqlb('delete from sessions'), filter);
     }
 
