@@ -28,12 +28,11 @@ export class UserAuthRepository extends SqlRepository {
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause('select * from user_auth', filter);
+        return this.sqlWithWhereClause(new Sqlb('select * from user_auth'), filter);
     }
 
-    sqlWithWhereClause(sql, filter){
-        const sqlb = new Sqlb(sql)
-            .add('where true');
+    sqlWithWhereClause(sqlb, filter){
+        sqlb.add('where true');
 
         if (!!filter.filterUserId) {
             sqlb.add('and user_id = $userId', {userId: filter.filterUserId});

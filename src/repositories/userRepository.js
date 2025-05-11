@@ -34,12 +34,11 @@ export class UserRepository extends SqlRepository {
     }
 
     buildSelectFromFilter(filter){
-        return this.sqlWithWhereClause('select * from users', filter);
+        return this.sqlWithWhereClause(new Sqlb('select * from users'), filter);
     }
 
-    sqlWithWhereClause(sql, filter){
-        const sqlb = new Sqlb(sql)
-            .add('where true');
+    sqlWithWhereClause(sqlb, filter){
+        sqlb.add('where true');
 
         if (!!filter.filterId) {
             sqlb.add('and id = $id', {id: filter.filterId});

@@ -2,7 +2,7 @@ import {SqlRepository} from "./_sqlRepository.js";
 import {Sqlb} from "./_sqlb.js";
 
 export class SessionFilter {
-    whereId(id){
+    whereId(id) {
         this.filterId = id;
         return this;
     }
@@ -27,8 +27,8 @@ export class SessionRepository extends SqlRepository {
         };
     }
 
-    buildSelectFromFilter(filter){
-        return this.sqlWithWhereClause('select * from sessions', filter);
+    buildSelectFromFilter(filter) {
+        return this.sqlWithWhereClause(new Sqlb('select * from sessions'), filter);
     }
 
     mapFromTable(row) {
@@ -41,28 +41,25 @@ export class SessionRepository extends SqlRepository {
         };
     }
 
-    buildDeteFromFilter(filter){
-        return this.sqlWithWhereClause('delete from sessions', filter);
+    buildDeteFromFilter(filter) {
+        return this.sqlWithWhereClause(new Sqlb('delete from sessions'), filter);
     }
 
-    sqlWithWhereClause(sql, filter){
-        const sqlb = new Sqlb(sql)
-            .add('where true');
+    sqlWithWhereClause(sqlb, filter) {
+        sqlb.add('where true');
 
-        if(!!filter.filterId){
+        if (!!filter.filterId) {
             sqlb.add('and id = $id', {id: filter.filterId});
         }
 
         return sqlb;
     }
 
-    async updateUsageAndValidUntil(id, lastUsed, validUntil) {
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`
-                    update sessions
-                    set last_used = $2,
-                        valid_until = $3
-                    where id = $1`,
-            [id, lastUsed, validUntil]);
+    async updateUsageAndValidUntil(filter) {
+        const sqlb = new Sqlb('update sessions');
+        sqlb.add(`set last_used = now(), valid_until = now() + interval '7 days'`)
+        this.sqlWithWhereClause(sqlb, filter);
+        const result = await this.execute(sqlb);
+        return result.rowCount;
     }
 }
