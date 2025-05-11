@@ -27,16 +27,6 @@ export class SessionRepository extends SqlRepository {
         };
     }
 
-    async updateUsageAndValidUntil(id, lastUsed, validUntil) {
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`
-                    update sessions
-                    set last_used = $2,
-                        valid_until = $3
-                    where id = $1`,
-            [id, lastUsed, validUntil]);
-    }
-
     buildSelectFromFilter(filter){
         const sqlb = new Sqlb('select * from sessions where true');
 
@@ -57,11 +47,23 @@ export class SessionRepository extends SqlRepository {
         };
     }
 
-    async remove(id) {
+    buildDeteFromFilter(filter){
+        const sqlb = new Sqlb('delete from sessions where true');
+
+        if(!!filter.filterId){
+            sqlb.add('and id = $id', {id: filter.filterId});
+        }
+
+        return sqlb;
+    }
+
+    async updateUsageAndValidUntil(id, lastUsed, validUntil) {
         const tx = await this.dbTransaction.tx();
-        await tx.query(`delete
-                        from sessions
-                        where id = $1;`,
-            [id]);
+        await tx.query(`
+                    update sessions
+                    set last_used = $2,
+                        valid_until = $3
+                    where id = $1`,
+            [id, lastUsed, validUntil]);
     }
 }

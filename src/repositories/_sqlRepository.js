@@ -65,4 +65,14 @@ export class SqlRepository {
         const result = await this.execute(sqlb);
         return result.rows.map(this.mapFromTable);
     }
+
+    buildDeteFromFilter(filter){
+        throw new Error(`'buildDeteFromFilter' must be overridden in child class ${this.constructor.name}.`);
+    }
+
+    async remove(filter) {
+        const sqlb = this.buildDeteFromFilter(filter);
+        const result = await this.execute(sqlb);
+        return result.rowCount;
+    }
 }

@@ -1,5 +1,6 @@
 import {AuthType} from "../domain/auth.js";
 import {Session} from "../domain/session.js";
+import {SessionFilter} from "../repositories/sessionRepository.js";
 
 export function formatSessionToken(id, secret){
     const buf = Buffer.from(id);
@@ -27,7 +28,8 @@ export class AuthDomainService {
     }
 
     async logout(sessionId) {
-        await this.sessionRepository.remove(sessionId.value);
+        await this.sessionRepository.remove(new SessionFilter()
+            .whereId(sessionId.value));
     }
 
     /**
