@@ -49,7 +49,7 @@ test('find user with wrong or missing parameter', async () => {
 test('find nonexisting user', async () => {
     // arrange
     const userRepository = {
-        find: jest.fn(() => null),
+        first: jest.fn(() => null),
     };
     const sut = new UserDomainService({userRepository, userAuthRepository: null});
 
@@ -63,7 +63,7 @@ test('find nonexisting user', async () => {
 test('find existing user', async () => {
     // arrange
     const userRepository = {
-        find: jest.fn(() => ({
+        first: jest.fn(() => ({
             id: "76f69c5f-3884-47c4-94d7-dff8f44270cf",
             username: "LittleBean",
             email: "bean@karo.gay",

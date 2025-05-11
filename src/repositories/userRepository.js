@@ -4,11 +4,10 @@ import {Sqlb} from "./_sqlb.js";
 import {SqlRepository} from "./Repository.js";
 import {chunked, isLastIndex} from "../utils/index.js";
 
-export class UserModel {
-    constructor(id, username, email) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
+export class UserFilter {
+    whereId(id) {
+        this.filterId = id;
+        return this;
     }
 }
 
@@ -37,35 +36,20 @@ export class UserRepository extends SqlRepository {
         }
     }
 
-    async find(selector) {
-        let sqlb = new Sqlb(
-            `select id, username, email
-             from users
-             where`
-        );
+    async first(filter) {
+        const sqlb = new Sqlb('select * from users where true');
 
-        switch (true) {
-            case selector.value instanceof UserId:
-                sqlb.add('id = $id', {id: selector.value.value});
-                break;
-            case selector.value instanceof UserName:
-                sqlb.add('username = $username', {username: selector.value.value});
-                break;
-            default:
-                throw new Error('Unreachable');
+        if(!!filter.filterId){
+            sqlb.add('and id = id', {id: filter.filterId});
         }
 
-        const {sql, params} = sqlb.build();
-        logger.debug(`executing sql: ${sql}`);
-        const tx = await this.dbTransaction.tx();
-        const result = await tx.query(sql, params);
+        sqlb.add('limit 1');
 
-        const users = result.rows.map(row => new UserModel(row.id, row.username, row.email));
-
-        if (users.length === 1) {
-            return users[0];
-        }
-
-        return null;
+        const result = await this.execute(sqlb);
+        return result.rows.map(row => ({
+            id: row.id,
+            username: row.username,
+            email: row.email,
+        }))[0] ?? null;
     }
 }

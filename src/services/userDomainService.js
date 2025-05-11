@@ -1,16 +1,14 @@
 import {AuthType, PasswordAuthentication} from "../domain/auth.js";
-import {UserModel} from "../repositories/userRepository.js";
+import {UserFilter} from "../repositories/userRepository.js";
 import {AuthMethodModel, PasswordAuthDetailsModel} from "../repositories/userAuthRepository.js";
 import {User, UserId, UserName, UserSelector} from "../domain/user.js";
 
 /**
  * Maps a User domain model to CreateUserModel
- * @param {import('../domain/user').User} user
- * @returns {UserModel}
  */
 export function createUserRequestModel(user)
 {
-    const model = new UserModel();
+    const model = {};
     model.id = user.id.value;
     model.username = user.username.value;
     model.email = user.email;
@@ -73,10 +71,13 @@ export class UserDomainService {
         if (!selector) throw new Error('selector must be provided');
         if (!(selector instanceof UserSelector)) throw new Error('selector must be a UserSelector');
 
-        const userModel = await this.userRepository.find(selector);
+        const userModel = await this.userRepository.first(new UserFilter()
+            .whereId(selector.value.value));
         if(!userModel) {
             return null;
         }
+
+        console.log(userModel);
 
         const user = new User(
             new UserName(userModel.username),

@@ -7,6 +7,7 @@ export class SqlRepository {
 
     async execute(sqlb) {
         const {sql, params} = sqlb.build();
+        console.log(sql);
         logger.debug('Executing sql', sql);
 
         const tx = await this.dbTransaction.tx();
