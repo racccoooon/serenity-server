@@ -28,20 +28,21 @@ export class UserRepository extends SqlRepository {
         };
     }
 
-    async first(filter) {
+    buildSelectFromFilter(filter){
         const sqlb = new Sqlb('select * from users where true');
 
         if (!!filter.filterId) {
             sqlb.add('and id = id', {id: filter.filterId});
         }
 
-        sqlb.add('limit 1');
+        return sqlb;
+    }
 
-        const result = await this.execute(sqlb);
-        return result.rows.map(row => ({
+    mapFromTable(row) {
+        return {
             id: row.id,
             username: row.username,
             email: row.email,
-        }))[0] ?? null;
+        };
     }
 }

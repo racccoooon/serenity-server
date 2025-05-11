@@ -37,23 +37,24 @@ export class SessionRepository extends SqlRepository {
             [id, lastUsed, validUntil]);
     }
 
-    async first(filter) {
+    buildSelectFromFilter(filter){
         const sqlb = new Sqlb('select * from sessions where true');
 
         if(!!filter.filterId){
             sqlb.add('and id = $id', {id: filter.filterId});
         }
 
-        sqlb.add('limit 1');
+        return sqlb;
+    }
 
-        const result = await this.execute(sqlb);
-        return result.rows.map(row => ({
+    mapFromTable(row) {
+        return {
             id: row.id,
             userId: row.user_id,
             salt: row.salt,
             hashedSecret: row.hashed_secret,
             validUntil: row.valid_until,
-        }))[0] ?? null;
+        };
     }
 
     async remove(id) {

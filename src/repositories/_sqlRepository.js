@@ -45,4 +45,24 @@ export class SqlRepository {
             await this.execute(sqlb);
         }
     }
+
+    buildSelectFromFilter(filter){
+        throw new Error(`'buildSelectFromFilter' must be overridden in child class ${this.constructor.name}.`);
+    }
+
+    mapFromTable(row) {
+        throw new Error(`'mapFromTable' must be overridden in child class ${this.constructor.name}.`);
+    }
+
+    async first(filter){
+        const sqlb = this.buildSelectFromFilter(filter);
+        const result = await this.execute(sqlb);
+        return result.rows.map(this.mapFromTable)[0] ?? null;
+    }
+
+    async list(filter) {
+        const sqlb = this.buildSelectFromFilter(filter);
+        const result = await this.execute(sqlb);
+        return result.rows.map(this.mapFromTable);
+    }
 }
