@@ -2,6 +2,7 @@ import { logger } from '../utils/logger.js';
 import {logout, makePublicToken, passwordLogin, registerUser} from './auth.js';
 import {createServer, getJoinedServers} from "./servers.js";
 import {getPublicKey} from "./wellKnown.js";
+import {getPublicUserProfile} from "./users.js";
 
 export function routes(fastify, options) {
   fastify.get('/api/health', async (request, reply) => {
@@ -21,4 +22,7 @@ export function routes(fastify, options) {
   // server routes
   createServer(fastify);
   getJoinedServers(fastify);
+
+  // user routes
+  getPublicUserProfile(fastify);
 }

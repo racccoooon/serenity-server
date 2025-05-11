@@ -49,6 +49,8 @@ export class UserRepository extends SqlRepository {
             id: row.id,
             username: row.username,
             email: row.email,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
         };
     }
 }

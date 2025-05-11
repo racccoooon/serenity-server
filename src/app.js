@@ -22,6 +22,7 @@ import cron from 'node-cron';
 import {LogoutCommand, LogoutHandler} from "./commands/auth/logout.js";
 import {ServerMemberRepository} from "./repositories/serverMemberRepository.js";
 import {GetServersOfUserHandler, GetServersOfUserQuery} from "./queries/servers/getServersOfUser.js";
+import {GetPublicUserProfileHandler, GetPublicUserProfileQuery} from "./queries/users/getPublicUserProfile.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -76,6 +77,10 @@ container.registerTransient(GetServersOfUserHandler, (c) => new GetServersOfUser
     c.resolve(ServerRepository),
 ));
 
+container.registerTransient(GetPublicUserProfileHandler, (c) => new GetPublicUserProfileHandler(
+    c.resolve(UserRepository),
+));
+
 const mediatorBuilder = new MediatorBuilder();
 
 mediatorBuilder.register(RegisterUserCommand, (c) =>  c.resolve(RegisterUserHandler));
@@ -85,6 +90,8 @@ mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublic
 
 mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
 mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUserHandler));
+
+mediatorBuilder.register(GetPublicUserProfileQuery, (c) => c.resolve(GetPublicUserProfileHandler));
 
 container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
 
