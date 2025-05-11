@@ -5,6 +5,7 @@ import {UserId} from "../domain/user.js";
 import {authenticateEntity} from "./_httpAuth.js";
 import {AuthError} from "../errors/authError.js";
 import {Mediator} from "../mediator/index.js";
+import {GetServersOfUserQuery} from "../queries/servers/getServersOfUser.js";
 
 const createServerSchema = z.object({
     name: z.string().nonempty().max(63),
@@ -28,14 +29,28 @@ export function createServer(fastify) {
 
         const requestDto = request.body;
 
-        const response = await request.scope.resolve(Mediator)
+        const server = await request.scope.resolve(Mediator)
             .send(new CreateServerCommand(
-                entity.id,
+                entity.id.value,
                 requestDto.name,
                 requestDto?.description
             ));
 
         reply.code(status.OK)
-            .send(new CreateServerResponse(response.id.value));
+            .send(new CreateServerResponse(server.id));
+    });
+}
+
+export function getJoinedServers(fastify) {
+    fastify.get('/api/v1/servers', async (request, reply) => {
+        const entity = await authenticateEntity(request);
+        if (!entity.isLocalUser()) throw new AuthError();
+
+        const response = await request.scope.resolve(Mediator)
+            .send(new GetServersOfUserQuery(
+                entity.id.value,
+            ));
+
+        reply.send(response);
     });
 }

@@ -1,64 +1,65 @@
-export class SessionModel {
-    constructor(id, userId, salt, hashedSecret, validUntil) {
-        this.id = id;
-        this.userId = userId;
-        this.salt = salt;
-        this.hashedSecret = hashedSecret;
-        this.validUntil = validUntil;
+import {SqlRepository} from "./_sqlRepository.js";
+import {Sqlb} from "./_sqlb.js";
+
+export class SessionFilter {
+    whereId(id) {
+        this.filterId = id;
+        return this;
     }
 }
 
-export class SessionRepository {
-    constructor(dbTransaction) {
-        this.dbTransaction = dbTransaction;
+export class SessionRepository extends SqlRepository {
+    get insertIntoSql() {
+        return 'insert into sessions (id, user_id, salt, hashed_secret, valid_until)';
     }
 
-    /**
-     * @param {SessionModel} param
-     * @returns {Promise<void>}
-     */
-    async add(param) {
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`
-            insert into sessions(id, user_id, salt, hashed_secret, valid_until)
-            values ($1, $2, $3, $4, $5);`,
-            [param.id, param.userId, param.salt, param.hashedSecret, param.validUntil]);
+    get insertRowSql() {
+        return '($id, $userId, $salt, $hashedSecret, $validUntil)';
     }
 
-    async updateUsageAndValidUntil(id, lastUsed, validUntil){
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`
-            update sessions
-            set last_used = $2, valid_until = $3
-            where id = $1`,
-            [id, lastUsed, validUntil]);
+    mapToTable(model) {
+        return {
+            id: model.id,
+            userId: model.userId,
+            salt: model.salt,
+            hashedSecret: model.hashedSecret,
+            validUntil: model.validUntil,
+        };
     }
 
-    async find(id) {
-        const tx = await this.dbTransaction.tx();
-        const result = await tx.query(`select id, user_id, salt, hashed_secret, valid_until
-                    from sessions
-                    where id = $1`,
-            [id]);
+    buildSelectFromFilter(filter) {
+        return this.sqlWithWhereClause(new Sqlb('select * from sessions'), filter);
+    }
 
-        const sessions = result.rows.map(row => new SessionModel(
-            row.id,
-            row.user_id,
-            row.salt,
-            row.hashed_secret,
-            row.valid_until,
-        ));
+    mapFromTable(row) {
+        return {
+            id: row.id,
+            userId: row.user_id,
+            salt: row.salt,
+            hashedSecret: row.hashed_secret,
+            validUntil: row.valid_until,
+        };
+    }
 
-        if(sessions.length === 1){
-            return sessions[0];
+    buildDeleteFromFilter(filter) {
+        return this.sqlWithWhereClause(new Sqlb('delete from sessions'), filter);
+    }
+
+    sqlWithWhereClause(sqlb, filter) {
+        sqlb.add('where true');
+
+        if (!!filter.filterId) {
+            sqlb.add('and id = $id', {id: filter.filterId});
         }
 
-        return null;
+        return sqlb;
     }
 
-    async remove(id) {
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`delete from sessions where id = $1;`,
-            [id]);
+    async updateUsageAndValidUntil(filter) {
+        const sqlb = new Sqlb('update sessions');
+        sqlb.add(`set last_used = now(), valid_until = now() + interval '7 days'`)
+        this.sqlWithWhereClause(sqlb, filter);
+        const result = await this.execute(sqlb);
+        return result.rowCount;
     }
 }

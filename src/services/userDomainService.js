@@ -1,36 +1,31 @@
 import {AuthType, PasswordAuthentication} from "../domain/auth.js";
-import {UserModel} from "../repositories/userRepository.js";
-import {AuthMethodModel, PasswordAuthDetailsModel} from "../repositories/userAuthRepository.js";
+import {UserFilter} from "../repositories/userRepository.js";
 import {User, UserId, UserName, UserSelector} from "../domain/user.js";
+import {UserAuthFilter} from "../repositories/userAuthRepository.js";
 
 /**
  * Maps a User domain model to CreateUserModel
- * @param {import('../domain/user').User} user
- * @returns {UserModel}
  */
 export function createUserRequestModel(user)
 {
-    const model = new UserModel();
+    const model = {};
     model.id = user.id.value;
     model.username = user.username.value;
     model.email = user.email;
     return model;
 }
 
-/**
- * @param {import('../domain/user.js').UserId} userId
- * @param {import('../domain/auth.js').AuthenticationMethod} method
- * @returns {AuthMethodModel}
- */
-export function createPasswordRequestModel(method)
+export function createPasswordRequestModel(userId, method)
 {
     if (method.type !== AuthType.PASSWORD) {
         throw new Error('Invalid authentication type, expected type password');
     }
 
-    const model = new AuthMethodModel();
+    const model = {};
     model.id = method.id;
-    model.details = new PasswordAuthDetailsModel(method.passwordHash);
+    model.userId = userId;
+    model.type = 'password';
+    model.details = {passwordHash: method.passwordHash};
     return model;
 }
 
@@ -60,7 +55,7 @@ export class UserDomainService {
         for (const authenticationMethod of user.authenticationMethods) {
             switch (authenticationMethod.type) {
                 case AuthType.PASSWORD:
-                    await this.userAuthRepository.addPassword(user.id.value, createPasswordRequestModel(authenticationMethod));
+                    await this.userAuthRepository.add(createPasswordRequestModel(user.id.value, authenticationMethod));
             }
         }
     }
@@ -73,7 +68,8 @@ export class UserDomainService {
         if (!selector) throw new Error('selector must be provided');
         if (!(selector instanceof UserSelector)) throw new Error('selector must be a UserSelector');
 
-        const userModel = await this.userRepository.find(selector);
+        const userModel = await this.userRepository.first(new UserFilter()
+            .whereUsername(selector.value.value));
         if(!userModel) {
             return null;
         }
@@ -83,7 +79,8 @@ export class UserDomainService {
             userModel.email,
             new UserId(userModel.id));
 
-        const authMethods = await this.userAuthRepository.byUserId(userModel.id);
+        const authMethods = await this.userAuthRepository.list(new UserAuthFilter()
+            .whereUserId(userModel.id));
         for (let authMethod of authMethods) {
             switch (authMethod.type) {
                 case 'password':
