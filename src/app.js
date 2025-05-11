@@ -90,6 +90,7 @@ mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandl
 
 container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
 
+// clean sessions every day at 00:00
 cron.schedule('0 0 * * *', cleanupSessions);
 
 // Start the server
