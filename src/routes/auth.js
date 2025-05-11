@@ -77,7 +77,7 @@ export function logout(fastify) {
             if (!entity.isLocalUser()) throw new AuthError();
 
             await request.scope.resolve(Mediator)
-                .send(new LogoutCommand(entity.session.id))
+                .send(new LogoutCommand(entity.sessionId))
 
             reply.code(status.NO_CONTENT);
         });

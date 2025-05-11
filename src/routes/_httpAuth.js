@@ -65,12 +65,7 @@ export async function authenticateEntity(request){
         }
 
         const authenticatedEntity = new AuthenticatedEntity('local_user', new UserId(dbSession.userId));
-        authenticatedEntity.session = Session.from(
-            new SessionId(dbSession.id),
-            new UserId(dbSession.userId),
-            dbSession.salt,
-            dbSession.hashedSecret,
-        );
+        authenticatedEntity.sessionId = new SessionId(dbSession.id);
         return authenticatedEntity;
     }
 
