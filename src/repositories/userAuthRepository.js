@@ -28,7 +28,12 @@ export class UserAuthRepository extends SqlRepository {
     }
 
     buildSelectFromFilter(filter) {
-        const sqlb = new Sqlb('select * from user_auth where true');
+        return this.sqlWithWhereClause('select * from user_auth', filter);
+    }
+
+    sqlWithWhereClause(sql, filter){
+        const sqlb = new Sqlb(sql)
+            .add('where true');
 
         if (!!filter.filterUserId) {
             sqlb.add('and user_id = $userId', {userId: filter.filterUserId});

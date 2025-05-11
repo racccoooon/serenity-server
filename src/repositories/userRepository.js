@@ -9,6 +9,11 @@ export class UserFilter {
         this.filterId = id;
         return this;
     }
+
+    whereUsername(username){
+        this.filterUsername = username;
+        return this;
+    }
 }
 
 export class UserRepository extends SqlRepository {
@@ -29,10 +34,15 @@ export class UserRepository extends SqlRepository {
     }
 
     buildSelectFromFilter(filter){
-        const sqlb = new Sqlb('select * from users where true');
+        return this.sqlWithWhereClause('select * from users', filter);
+    }
+
+    sqlWithWhereClause(sql, filter){
+        const sqlb = new Sqlb(sql)
+            .add('where true');
 
         if (!!filter.filterId) {
-            sqlb.add('and id = id', {id: filter.filterId});
+            sqlb.add('and id = $id', {id: filter.filterId});
         }
 
         return sqlb;

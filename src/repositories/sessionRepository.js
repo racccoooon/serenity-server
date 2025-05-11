@@ -28,13 +28,7 @@ export class SessionRepository extends SqlRepository {
     }
 
     buildSelectFromFilter(filter){
-        const sqlb = new Sqlb('select * from sessions where true');
-
-        if(!!filter.filterId){
-            sqlb.add('and id = $id', {id: filter.filterId});
-        }
-
-        return sqlb;
+        return this.sqlWithWhereClause('select * from sessions', filter);
     }
 
     mapFromTable(row) {
@@ -48,7 +42,12 @@ export class SessionRepository extends SqlRepository {
     }
 
     buildDeteFromFilter(filter){
-        const sqlb = new Sqlb('delete from sessions where true');
+        return this.sqlWithWhereClause('delete from sessions', filter);
+    }
+
+    sqlWithWhereClause(sql, filter){
+        const sqlb = new Sqlb(sql)
+            .add('where true');
 
         if(!!filter.filterId){
             sqlb.add('and id = $id', {id: filter.filterId});

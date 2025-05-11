@@ -69,7 +69,7 @@ export class UserDomainService {
         if (!(selector instanceof UserSelector)) throw new Error('selector must be a UserSelector');
 
         const userModel = await this.userRepository.first(new UserFilter()
-            .whereId(selector.value.value));
+            .whereUsername(selector.value.value));
         if(!userModel) {
             return null;
         }
