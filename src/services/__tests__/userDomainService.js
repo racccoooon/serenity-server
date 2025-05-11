@@ -70,7 +70,7 @@ test('find existing user', async () => {
         })),
     };
     const userAuthRepository = {
-        byUserId: jest.fn(id => [
+        list: jest.fn(id => [
             {
                 type: 'password',
                 details: {

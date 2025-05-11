@@ -1,6 +1,7 @@
 import {AuthType, PasswordAuthentication} from "../domain/auth.js";
 import {UserFilter} from "../repositories/userRepository.js";
 import {User, UserId, UserName, UserSelector} from "../domain/user.js";
+import {UserAuthFilter} from "../repositories/userAuthRepository.js";
 
 /**
  * Maps a User domain model to CreateUserModel
@@ -78,7 +79,8 @@ export class UserDomainService {
             userModel.email,
             new UserId(userModel.id));
 
-        const authMethods = await this.userAuthRepository.byUserId(userModel.id);
+        const authMethods = await this.userAuthRepository.list(new UserAuthFilter()
+            .whereUserId(userModel.id));
         for (let authMethod of authMethods) {
             switch (authMethod.type) {
                 case 'password':

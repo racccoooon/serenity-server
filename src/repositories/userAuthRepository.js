@@ -27,23 +27,14 @@ export class UserAuthRepository extends SqlRepository{
         };
     }
 
-    /**
-     *
-     * @param {import('../domain/user.js').UserId} userId
-     * @returns {Promise<AuthMethodModel[]>}
-     */
-    async byUserId(userId) {
-        let sqlb = new Sqlb(
-            `select id, type, details from user_auth where`
-        );
+    async list(filter) {
+        const sqlb = new Sqlb('select * from user_auth where true');
 
-        sqlb.add('user_id = $userId', {userId: userId});
+        if(!!filter.filterUserId){
+            sqlb.add('and user_id = $userId', {userId: filter.filterUserId});
+        }
 
-        const {sql, params} = sqlb.build();
-        logger.debug(`executing sql: ${sql}`);
-        const tx = await this.dbTransaction.tx();
-        const result = await tx.query(sql, params);
-
+        const result = await this.execute(sqlb);
         return result.rows.map(row => {
             switch (row.type) {
                 case 'password':
