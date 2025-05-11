@@ -3,6 +3,7 @@ import {z} from "zod";
 import {UserId, userIdSchema} from "./user.js";
 import {v4} from "uuid";
 import { randomBytes, createHash } from 'crypto';
+import {DateTime} from "luxon";
 
 export const sessionTokenSchema = z.string().trim().nonempty();
 
@@ -29,6 +30,7 @@ export class Session {
     #userId;
     #salt;
     #hashedSecret;
+    #validUntil;
 
     /**
      * @param {import('user.js').UserId} userId
@@ -50,6 +52,7 @@ export class Session {
         session.#userId = userId;
         session.#salt = salt;
         session.#hashedSecret = hashedSecret;
+        session.#validUntil = DateTime.now().plus({days: 7});
         return { session, secret };
     }
 
@@ -59,9 +62,10 @@ export class Session {
      * @param {UserId} userId
      * @param {Buffer} salt
      * @param {Buffer} hashedSecret
+     * @param {Date} validUntil
      * @returns {Session}
      */
-    static from(id, userId, salt, hashedSecret) {
+    static from(id, userId, salt, hashedSecret, validUntil) {
         if (!(id instanceof SessionId)) throw new Error('Id must be a SessionId');
         if (!(userId instanceof UserId)) throw new Error('UserId must be a UserId');
 
@@ -70,6 +74,7 @@ export class Session {
         session.#userId = userId;
         session.#salt = salt;
         session.#hashedSecret = hashedSecret;
+        session.#validUntil = validUntil;
         return session;
     }
 
@@ -87,5 +92,9 @@ export class Session {
 
     get hashedSecret() {
         return this.#hashedSecret;
+    }
+
+    get validUntil() {
+        return this.#validUntil;
     }
 }

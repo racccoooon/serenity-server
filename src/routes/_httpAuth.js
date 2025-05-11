@@ -2,6 +2,7 @@ import {AuthError} from "../errors/authError.js";
 import {SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
 import {UserId} from "../domain/user.js";
+import {DateTime} from "luxon";
 import {Session, SessionId} from "../domain/session.js";
 
 export class AuthenticatedEntity {
@@ -55,6 +56,10 @@ export async function authenticateEntity(request){
             throw new AuthError();
         }
 
+        if(DateTime.fromJSDate(dbSession.validUntil) < DateTime.now()){
+            throw new AuthError();
+        }
+
         const hash = createHash('sha256');
         hash.update(secret);
         hash.update(dbSession.salt);
@@ -63,6 +68,12 @@ export async function authenticateEntity(request){
         if(Buffer.compare(hashedSecret, dbSession.hashedSecret) !== 0){
             throw new AuthError();
         }
+
+        const now = DateTime.now();
+        await sessionRepo.updateUsageAndValidUntil(
+            sessionId,
+            now,
+            now.plus({days: 7}));
 
         const authenticatedEntity = new AuthenticatedEntity('local_user', new UserId(dbSession.userId));
         authenticatedEntity.sessionId = new SessionId(dbSession.id);
