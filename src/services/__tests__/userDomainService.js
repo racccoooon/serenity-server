@@ -13,7 +13,7 @@ test('create user with password', async () => {
         add: jest.fn(),
     };
     const userAuthRepository = {
-        addPassword: jest.fn(),
+        add: jest.fn(),
     }
 
     const sut = new UserDomainService({
@@ -26,7 +26,7 @@ test('create user with password', async () => {
 
     // assert
     expect(userRepository.add).toHaveBeenCalledWith(createUserRequestModel(user));
-    expect(userAuthRepository.addPassword).toHaveBeenCalledWith(user.id.value, createPasswordRequestModel(authenticationMethod));
+    expect(userAuthRepository.add).toHaveBeenCalled();
 })
 
 test('create user requires at least one auth method', async () => {

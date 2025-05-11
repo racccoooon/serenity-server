@@ -14,7 +14,7 @@ export function createUserRequestModel(user)
     return model;
 }
 
-export function createPasswordRequestModel(method)
+export function createPasswordRequestModel(userId, method)
 {
     if (method.type !== AuthType.PASSWORD) {
         throw new Error('Invalid authentication type, expected type password');
@@ -22,6 +22,8 @@ export function createPasswordRequestModel(method)
 
     const model = {};
     model.id = method.id;
+    model.userId = userId;
+    model.type = 'password';
     model.details = {passwordHash: method.passwordHash};
     return model;
 }
@@ -52,7 +54,7 @@ export class UserDomainService {
         for (const authenticationMethod of user.authenticationMethods) {
             switch (authenticationMethod.type) {
                 case AuthType.PASSWORD:
-                    await this.userAuthRepository.addPassword(user.id.value, createPasswordRequestModel(authenticationMethod));
+                    await this.userAuthRepository.add(createPasswordRequestModel(user.id.value, authenticationMethod));
             }
         }
     }

@@ -3,12 +3,21 @@ import {Sqlb} from "./_sqlb.js";
 import {SqlRepository} from "./Repository.js";
 
 export class UserAuthRepository extends SqlRepository{
-    async addPassword(userId, authMethod) {
-        const tx = await this.dbTransaction.tx();
-        await tx.query(`
-            insert into user_auth (id, user_id, type, details)
-            values ($1, $2, $3, $4);`,
-            [authMethod.id, userId, 'password', authMethod.details]);
+    get insertIntoSql() {
+        return 'insert into user_auth (id, user_id, type, details)';
+    }
+
+    get insertRowSql() {
+        return '($id, $userId, $type, $details)';
+    }
+
+    mapToTable(model) {
+        return {
+            id: model.id,
+            userId: model.userId,
+            type: model.type,
+            details: model.details,
+        };
     }
 
     /**
