@@ -23,8 +23,9 @@ import {perRequestScopeHook} from "./hooks/perRequestScope.js";
 import {LogoutCommand, LogoutHandler} from "./commands/auth/logout.js";
 
 const fastify = Fastify({logger: false});
-// allow empty content-type headers
+// fall-back content type handler
 fastify.addContentTypeParser('*', function (req, payload, done) {
+    // pass empty object to request handler, ignoring body
     done(null, {})
 })
 
