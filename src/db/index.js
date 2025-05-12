@@ -6,6 +6,8 @@ import {logger} from '../utils/logger.js';
 
 const {Pool} = pg;
 
+console.log(config.db.host);
+
 export const pool = new Pool(config.db);
 
 // Add error handling for the pool
@@ -13,14 +15,10 @@ pool.on('error', (err) => {
     logger.error('Unexpected error on idle client', err);
 });
 
-const dbConfig = {
-    ...config.db,
-};
-
 export async function runMigrations() {
     try {
         // Run migrations
-        await migrate(dbConfig, './src/db/migrations');
+        await migrate(config.db, './src/db/migrations');
 
         logger.info('Migrations completed successfully.');
     } catch (err) {
