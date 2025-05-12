@@ -26,6 +26,8 @@ import {GetPublicUserProfileHandler, GetPublicUserProfileQuery} from "./queries/
 import {InviteRepository} from "./repositories/inviteRepository.js";
 import {CreateInviteCommand, CreateInviteHandler} from "./commands/invite/createInvite.js";
 import {GetServerInvitesHandler, GetServerInvitesQuery} from "./queries/invites/getInvitesOfServer.js";
+import {CreateChannelCommand, CreateChannelHandler} from "./commands/channel/createChannel.js";
+import {ChannelRepository} from "./repositories/channelRepository.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -55,6 +57,7 @@ container.registerTransient(SessionRepository, (c) => new SessionRepository(c.re
 container.registerTransient(ServerRepository, (c) => new ServerRepository(c.resolve(DbTransaction)));
 container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepository(c.resolve(DbTransaction)));
 container.registerTransient(InviteRepository, (c) => new InviteRepository(c.resolve(DbTransaction)));
+container.registerTransient(ChannelRepository, (c) => new ChannelRepository(c.resolve(DbTransaction)));
 
 // commands and queries
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
@@ -81,6 +84,10 @@ container.registerTransient(GetServersOfUserHandler, (c) => new GetServersOfUser
     c.resolve(ServerRepository),
 ));
 
+container.registerTransient(CreateChannelHandler, (c) => new CreateChannelHandler(
+    c.resolve(ChannelRepository),
+));
+
 container.registerTransient(GetPublicUserProfileHandler, (c) => new GetPublicUserProfileHandler(
     c.resolve(UserRepository),
 ));
@@ -101,6 +108,8 @@ mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublic
 
 mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
 mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUserHandler));
+
+mediatorBuilder.register(CreateChannelCommand, (c) => c.resolve(CreateChannelHandler));
 
 mediatorBuilder.register(GetPublicUserProfileQuery, (c) => c.resolve(GetPublicUserProfileHandler));
 
