@@ -10,6 +10,7 @@ test('foo', async () => {
 
     const command = new CreateInviteCommand(
         v4(),
+        v4(),
         null,
     );
 
