@@ -15,7 +15,7 @@ export class CreateChannelHandler {
     }
 
     async handle(command) {
-        const biggestRank = await this.channelRepository.getBiggestRank(command.serverId, command.groupId);
+        const biggestRank = await this.channelRepository.getBiggestRank(command.groupId);
         const lexoRank = (biggestRank !== null)
             ? LexoRank.parse(biggestRank).genNext().toString()
             : LexoRank.min().toString();

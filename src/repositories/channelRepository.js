@@ -69,19 +69,13 @@ export class ChannelRepository extends SqlRepository {
         return sqlb;
     }
 
-    async getBiggestRank(serverId, groupId) {
+    async getBiggestRank(groupId) {
         const sqlb = new Sqlb(`
-                    select c.rank
-                    from channels as c
-                    join channel_groups g on g.id = c.group_id
-                    where g.server_id = $serverId`,
-            {serverId: serverId});
-
-        if (groupId) {
-            sqlb.add(`and "group_id" = $groupId`, {groupId: groupId});
-        }
-
-        sqlb.add(`order by rank desc limit 1`);
+                    select rank
+                    from channels
+                    where group_id = $groupId
+                    order by rank desc limit 1`,
+            {groupId: groupId});
 
         const result = await this.execute(sqlb);
         return result.rows.map(row => row.rank)[0] ?? null;
