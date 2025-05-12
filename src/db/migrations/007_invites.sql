@@ -1,5 +1,9 @@
 alter table users
-    add column type text not null default 'local';
+    add column is_local text not null default true;
+
+alter table users
+    alter column is_local
+        drop default;
 
 alter table users
     add column instance text;

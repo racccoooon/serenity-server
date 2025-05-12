@@ -46,7 +46,7 @@ export class InviteRepository extends SqlRepository {
     sqlWithWhereClause(sqlb, filter) {
         sqlb.add(`where true`);
 
-        if (!!filter.filterServer){
+        if (filter.filterServer !== undefined){
             sqlb.add(`and server_id = $serverId`, {serverId: filter.filterServer})
         }
 

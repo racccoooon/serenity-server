@@ -31,7 +31,8 @@ export class RegisterUserHandler {
         const user = {
             id: v4(),
             username: command.username,
-            email: command.email
+            email: command.email,
+            isLocal: true,
         };
         await this.userRepository.add(user);
 

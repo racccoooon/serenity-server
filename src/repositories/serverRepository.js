@@ -29,7 +29,7 @@ export class ServerRepository extends SqlRepository {
     sqlWithWhereClause(sqlb, filter) {
         sqlb.add('where true');
 
-        if (!!filter.filterIsMember) {
+        if (filter.filterIsMember !== undefined) {
             sqlb.add(`and exists (select true from server_members where server_id = servers.id and user_id = $userId)`, {userId: filter.filterIsMember});
         }
 

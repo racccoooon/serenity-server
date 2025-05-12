@@ -15,11 +15,11 @@ export class UserFilter {
 
 export class UserRepository extends SqlRepository {
     get insertIntoSql() {
-        return 'insert into users (id, username, email)';
+        return 'insert into users (id, username, email, is_local)';
     }
 
     get insertRowSql() {
-        return '($id, $username, $email)';
+        return '($id, $username, $email, $isLocal)';
     }
 
     mapToTable(model) {
@@ -27,6 +27,7 @@ export class UserRepository extends SqlRepository {
             id: model.id,
             username: model.username,
             email: model.email,
+            isLocal: model.isLocal,
         };
     }
 
@@ -37,7 +38,7 @@ export class UserRepository extends SqlRepository {
     sqlWithWhereClause(sqlb, filter){
         sqlb.add('where true');
 
-        if (!!filter.filterId) {
+        if (filter.filterId !== undefined) {
             sqlb.add('and id = $id', {id: filter.filterId});
         }
 
@@ -49,6 +50,7 @@ export class UserRepository extends SqlRepository {
             id: row.id,
             username: row.username,
             email: row.email,
+            isLocal: row.is_local,
             createdAt: row.created_at,
             updatedAt: row.updated_at,
         };
