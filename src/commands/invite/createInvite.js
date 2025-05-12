@@ -1,7 +1,8 @@
 import {v4} from "uuid";
 
 export class CreateInviteCommand {
-    constructor(invitedById, validUntil) {
+    constructor(serverId, invitedById, validUntil) {
+        this.serverId = serverId;
         this.invitedById = invitedById;
         this.validUntil = validUntil;
     }
@@ -21,6 +22,7 @@ export class CreateInviteHandler {
     async handle(command) {
         const invite = {
             id: v4(),
+            serverId: command.serverId,
             invitedById: command.invitedById,
             validUntil: command.validUntil,
         };

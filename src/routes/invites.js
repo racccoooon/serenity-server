@@ -6,6 +6,10 @@ import {status} from "http-status";
 import {Mediator} from "../mediator/index.js";
 import {CreateInviteCommand} from "../commands/invite/createInvite.js";
 
+export function listServerInvites(fastify) {
+    fastify.get('/api/v1/server/')
+}
+
 const createInviteSchema = z.object({
     validUntil: z.string().datetime().optional().transform(x => x ? DateTime.fromISO(x) : null),
 });
@@ -23,6 +27,7 @@ export function createInvite(fastify) {
 
         const invite = await request.scope.resolve(Mediator)
             .send(new CreateInviteCommand(
+                request.params.serverId,
                 entity.id,
                 requestDto.validUntil,
             ));

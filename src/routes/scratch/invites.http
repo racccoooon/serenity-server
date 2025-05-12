@@ -7,3 +7,8 @@ Content-Type: application/json
 {
 
 }
+
+### Get all invites in a server
+GET localhost:5680/api/v1/server/ac20ef09-870b-4405-89e1-4eb5a59f7b4a/invites
+Authorization: {{bearer_token}}
+Accept: application/json

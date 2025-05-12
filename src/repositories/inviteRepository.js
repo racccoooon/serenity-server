@@ -3,16 +3,17 @@ import {Sqlb} from "./_sqlb.js";
 
 export class InviteRepository extends SqlRepository {
     get insertIntoSql() {
-        return `insert into invites (id, invited_by_id, valid_until)`;
+        return `insert into invites (id, server_id, invited_by_id, valid_until)`;
     }
 
     get insertRowSql() {
-        return `($id, $invitedById, $validUntil)`;
+        return `($id, $serverId, $invitedById, $validUntil)`;
     }
 
     mapToTable(model) {
         return {
             id: model.id,
+            serverId: model.serverId,
             invitedById: model.invitedById,
             validUntil: model.validUntil,
         };
@@ -25,6 +26,7 @@ export class InviteRepository extends SqlRepository {
     mapFromTable(row) {
         return{
             id: row.id,
+            serverId: row.server_id,
             invitedById: row.invited_by_id,
             validUntil: row.valid_until,
         };

@@ -10,6 +10,7 @@ alter table users
 create table invites
 (
     id            uuid primary key,
+    server_id     uuid references servers (id) on delete cascade,
     invited_by_id uuid references users (id) on delete cascade,
     valid_until   timestamptz,
     created_at    timestamptz not null,
