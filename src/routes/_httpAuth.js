@@ -77,7 +77,6 @@ export async function authenticateEntity(request) {
             throw new AuthError();
         }
 
-        const now = DateTime.now();
         await sessionRepo.updateUsageAndValidUntil(new SessionFilter()
             .whereId(sessionId));
 
@@ -128,8 +127,6 @@ export async function authenticateEntity(request) {
 }
 
 function verifyRequestSignature(request, pubKey){
-    console.log(pubKey);
-    console.log(request);
 
     //TODO implement this
 }
