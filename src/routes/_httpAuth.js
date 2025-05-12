@@ -18,6 +18,10 @@ export class AuthenticatedEntity {
         return this.type === 'remote_user';
     }
 
+    isUser() {
+        return this.isLocalUser() || this.isRemoteUser();
+    }
+
     isRemoteInstance() {
         return this.type === 'remote_instance';
     }

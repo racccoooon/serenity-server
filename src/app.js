@@ -23,6 +23,8 @@ import {LogoutCommand, LogoutHandler} from "./commands/auth/logout.js";
 import {ServerMemberRepository} from "./repositories/serverMemberRepository.js";
 import {GetServersOfUserHandler, GetServersOfUserQuery} from "./queries/servers/getServersOfUser.js";
 import {GetPublicUserProfileHandler, GetPublicUserProfileQuery} from "./queries/users/getPublicUserProfile.js";
+import {InviteRepository} from "./repositories/inviteRepository.js";
+import {CreateInviteCommand, CreateInviteHandler} from "./commands/invite/createInvite.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -51,6 +53,7 @@ container.registerTransient(UserAuthRepository, (c) => new UserAuthRepository(c.
 container.registerTransient(SessionRepository, (c) => new SessionRepository(c.resolve(DbTransaction)));
 container.registerTransient(ServerRepository, (c) => new ServerRepository(c.resolve(DbTransaction)));
 container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepository(c.resolve(DbTransaction)));
+container.registerTransient(InviteRepository, (c) => new InviteRepository(c.resolve(DbTransaction)));
 
 // commands and queries
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
@@ -81,6 +84,10 @@ container.registerTransient(GetPublicUserProfileHandler, (c) => new GetPublicUse
     c.resolve(UserRepository),
 ));
 
+container.registerTransient(CreateInviteHandler, (c) => new CreateInviteHandler(
+    c.resolve(InviteRepository),
+));
+
 const mediatorBuilder = new MediatorBuilder();
 
 mediatorBuilder.register(RegisterUserCommand, (c) =>  c.resolve(RegisterUserHandler));
@@ -92,6 +99,8 @@ mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandl
 mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUserHandler));
 
 mediatorBuilder.register(GetPublicUserProfileQuery, (c) => c.resolve(GetPublicUserProfileHandler));
+
+mediatorBuilder.register(CreateInviteCommand, (c) => c.resolve(CreateInviteHandler));
 
 container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
 

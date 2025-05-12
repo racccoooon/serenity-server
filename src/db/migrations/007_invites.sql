@@ -9,11 +9,11 @@ alter table users
 
 create table invites
 (
-    id          uuid primary key,
-    user_id     uuid references users (id) on delete cascade,
-    valid_until timestamptz,
-    created_at  timestamptz not null,
-    updated_at  timestamptz
+    id            uuid primary key,
+    invited_by_id uuid references users (id) on delete cascade,
+    valid_until   timestamptz,
+    created_at    timestamptz not null,
+    updated_at    timestamptz
 );
 
 create trigger trg_invites_set_created_at
