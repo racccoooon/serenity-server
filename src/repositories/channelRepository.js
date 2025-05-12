@@ -39,9 +39,8 @@ export class ChannelRepository extends SqlRepository {
     mapFromTable(row) {
         return {
             id: row.id,
-            serverId: row.server_id,
+            groupId: row.group_id,
             name: row.name,
-            group: row.group,
             rank: row.rank,
         }
     }

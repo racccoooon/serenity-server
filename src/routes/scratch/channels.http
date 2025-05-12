@@ -5,7 +5,7 @@ Authorization: {{bearer_token}}
 Content-Type: application/json
 
 {
-  "name": "raccon group"
+  "name": "raccon2 group"
 }
 
 ### get channel groups in server
@@ -22,7 +22,7 @@ Content-Type: application/json
 
 {
   "name": "Raccoon channel",
-  "groupId": "48d5f6ee-46c3-4e4c-b979-bcaa9d1ce4be"
+  "groupId": "0352388e-308c-4e0e-9e98-c626b4355b0b"
 }
 
 ### get channels in server
