@@ -101,6 +101,7 @@ container.registerTransient(GetChannelGroupsInServerHandler, (c) => new GetChann
 ));
 
 container.registerTransient(CreateChannelHandler, (c) => new CreateChannelHandler(
+    c.resolve(ChannelGroupRepository),
     c.resolve(ChannelRepository),
 ));
 container.registerTransient(GetChannelsInServerHandler, (c) => new GetChannelsInServerHandler(
