@@ -4,7 +4,7 @@ import {createServer, getJoinedServers} from "./servers.js";
 import {getPublicKey} from "./wellKnown.js";
 import {getPublicUserProfile} from "./users.js";
 import {createInvite, listServerInvites} from "./invites.js";
-import {createChannel, getChannelsInServer} from "./channels.js";
+import {createChannel, createChannelGroup, getChannelGroupsInServer, getChannelsInServer} from "./channels.js";
 
 export function routes(fastify, options) {
   fastify.get('/api/health', async (request, reply) => {
@@ -26,6 +26,8 @@ export function routes(fastify, options) {
   getJoinedServers(fastify);
 
   // channel routes
+  createChannelGroup(fastify);
+  getChannelGroupsInServer(fastify);
   createChannel(fastify);
   getChannelsInServer(fastify);
 

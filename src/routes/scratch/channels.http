@@ -1,3 +1,19 @@
+### create a channel group on a server
+POST localhost:5680/api/v1/servers/ac7d38cd-3ba5-4e6b-9f79-31005f530c47/channel-groups
+Accept: application/json
+Authorization: {{bearer_token}}
+Content-Type: application/json
+
+{
+  "name": "raccon group"
+}
+
+### get channel groups in server
+GET localhost:5680/api/v1/servers/ac7d38cd-3ba5-4e6b-9f79-31005f530c47/channel-groups
+Accept: application/json
+Authorization: {{bearer_token}}
+
+
 ### create a channel in the default group (none)
 POST localhost:5680/api/v1/servers/ac7d38cd-3ba5-4e6b-9f79-31005f530c47/channels
 Accept: application/json
@@ -5,7 +21,8 @@ Authorization: {{bearer_token}}
 Content-Type: application/json
 
 {
-  "name": "Bean channel"
+  "name": "Raccoon channel",
+  "groupId": "48d5f6ee-46c3-4e4c-b979-bcaa9d1ce4be"
 }
 
 ### get channels in server

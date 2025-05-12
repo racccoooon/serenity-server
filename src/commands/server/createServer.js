@@ -15,9 +15,10 @@ export class CreateServerResponse {
 }
 
 export class CreateServerHandler {
-    constructor(serverRepository, serverMemberRepository) {
+    constructor(serverRepository, serverMemberRepository, channelGroupRepository) {
         this.serverRepository = serverRepository;
         this.serverMemberRepository = serverMemberRepository;
+        this.channelGroupRepository = channelGroupRepository;
     }
 
     async handle(command) {

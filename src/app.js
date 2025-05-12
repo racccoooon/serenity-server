@@ -29,6 +29,12 @@ import {GetServerInvitesHandler, GetServerInvitesQuery} from "./queries/invites/
 import {CreateChannelCommand, CreateChannelHandler} from "./commands/channel/createChannel.js";
 import {ChannelRepository} from "./repositories/channelRepository.js";
 import {GetChannelsInServerHandler, GetChannelsInServerQuery} from "./queries/channels/getChannelsInServer.js";
+import {ChannelGroupRepository} from "./repositories/channelGroupRepository.js";
+import {CreateChannelGroupCommand, CreateChannelGroupHandler} from "./commands/channelGroup/createChannelGroup.js";
+import {
+    GetChannelGroupsInServerHandler,
+    GetChannelGroupsInServerQuery
+} from "./queries/channelGroup/getChannelGroupsInServer.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -58,6 +64,7 @@ container.registerTransient(SessionRepository, (c) => new SessionRepository(c.re
 container.registerTransient(ServerRepository, (c) => new ServerRepository(c.resolve(DbTransaction)));
 container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepository(c.resolve(DbTransaction)));
 container.registerTransient(InviteRepository, (c) => new InviteRepository(c.resolve(DbTransaction)));
+container.registerTransient(ChannelGroupRepository, (c) => new ChannelGroupRepository(c.resolve(DbTransaction)));
 container.registerTransient(ChannelRepository, (c) => new ChannelRepository(c.resolve(DbTransaction)));
 
 // commands and queries
@@ -80,9 +87,17 @@ container.registerTransient(CreatePublicTokenHandler, (c) => new CreatePublicTok
 container.registerTransient(CreateServerHandler, (c) => new CreateServerHandler(
     c.resolve(ServerRepository),
     c.resolve(ServerMemberRepository),
+    c.resolve(ChannelGroupRepository),
 ));
 container.registerTransient(GetServersOfUserHandler, (c) => new GetServersOfUserHandler(
     c.resolve(ServerRepository),
+));
+
+container.registerTransient(CreateChannelGroupHandler, (c) => new CreateChannelGroupHandler(
+    c.resolve(ChannelGroupRepository),
+));
+container.registerTransient(GetChannelGroupsInServerHandler, (c) => new GetChannelGroupsInServerHandler(
+    c.resolve(ChannelGroupRepository),
 ));
 
 container.registerTransient(CreateChannelHandler, (c) => new CreateChannelHandler(
@@ -112,6 +127,9 @@ mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublic
 
 mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
 mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUserHandler));
+
+mediatorBuilder.register(CreateChannelGroupCommand, (c) => c.resolve(CreateChannelGroupHandler));
+mediatorBuilder.register(GetChannelGroupsInServerQuery, (c) => c.resolve(GetChannelGroupsInServerHandler));
 
 mediatorBuilder.register(CreateChannelCommand, (c) => c.resolve(CreateChannelHandler));
 mediatorBuilder.register(GetChannelsInServerQuery, (c) => c.resolve(GetChannelsInServerHandler));
