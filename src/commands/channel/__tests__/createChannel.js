@@ -22,6 +22,7 @@ test('creates channel and in group', async () => {
     await handler.handle(command);
 
     // assert
+    expect(channelGroupRepo.first).toHaveBeenCalled();
     expect(channelRepo.getBiggestRank).toHaveBeenCalled();
     expect(channelRepo.add).toHaveBeenCalled();
 });
