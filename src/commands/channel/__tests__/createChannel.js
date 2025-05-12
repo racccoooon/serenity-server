@@ -4,14 +4,19 @@ import {jest} from '@jest/globals';
 
 test('creates channel and in group', async () => {
     // arrange
-    const command = new CreateChannelCommand(v4(), v4(), "name");
+    const serverId = v4();
+    const command = new CreateChannelCommand(serverId, v4(), "name");
+
+    const channelGroupRepo = {
+        first: jest.fn(() => ({serverId: serverId})),
+    }
 
     const channelRepo = {
         getBiggestRank: jest.fn(() => null),
         add: jest.fn(),
     }
 
-    const handler = new CreateChannelHandler(channelRepo);
+    const handler = new CreateChannelHandler(channelGroupRepo, channelRepo);
 
     // act
     await handler.handle(command);
