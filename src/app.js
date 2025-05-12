@@ -25,6 +25,7 @@ import {GetServersOfUserHandler, GetServersOfUserQuery} from "./queries/servers/
 import {GetPublicUserProfileHandler, GetPublicUserProfileQuery} from "./queries/users/getPublicUserProfile.js";
 import {InviteRepository} from "./repositories/inviteRepository.js";
 import {CreateInviteCommand, CreateInviteHandler} from "./commands/invite/createInvite.js";
+import {GetServerInvitesHandler, GetServerInvitesQuery} from "./queries/invites/getInvitesOfServer.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -87,6 +88,9 @@ container.registerTransient(GetPublicUserProfileHandler, (c) => new GetPublicUse
 container.registerTransient(CreateInviteHandler, (c) => new CreateInviteHandler(
     c.resolve(InviteRepository),
 ));
+container.registerTransient(GetServerInvitesHandler, (c) => new GetServerInvitesHandler(
+    c.resolve(InviteRepository),
+));
 
 const mediatorBuilder = new MediatorBuilder();
 
@@ -101,6 +105,7 @@ mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUse
 mediatorBuilder.register(GetPublicUserProfileQuery, (c) => c.resolve(GetPublicUserProfileHandler));
 
 mediatorBuilder.register(CreateInviteCommand, (c) => c.resolve(CreateInviteHandler));
+mediatorBuilder.register(GetServerInvitesQuery, (c) => c.resolve(GetServerInvitesHandler));
 
 container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
 

@@ -5,9 +5,21 @@ import {AuthError} from "../errors/authError.js";
 import {status} from "http-status";
 import {Mediator} from "../mediator/index.js";
 import {CreateInviteCommand} from "../commands/invite/createInvite.js";
+import {GetServerInvitesQuery} from "../queries/invites/getInvitesOfServer.js";
 
 export function listServerInvites(fastify) {
-    fastify.get('/api/v1/server/')
+    fastify.get('/api/v1/servers/:serverId/invites',
+        async (request, reply) => {
+            const entity = await authenticateEntity(request);
+            if (!entity.isUser()) throw new AuthError();
+
+            const response = await request.scope.resolve(Mediator)
+                .send(new GetServerInvitesQuery(
+                    request.params.serverId,
+                ));
+
+            reply.send(response);
+        });
 }
 
 const createInviteSchema = z.object({

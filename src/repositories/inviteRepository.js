@@ -1,6 +1,13 @@
 import {SqlRepository} from "./_sqlRepository.js";
 import {Sqlb} from "./_sqlb.js";
 
+export class InviteFilter {
+    whereServer(serverId){
+        this.filterServer = serverId;
+        return this;
+    }
+}
+
 export class InviteRepository extends SqlRepository {
     get insertIntoSql() {
         return `insert into invites (id, server_id, invited_by_id, valid_until)`;
@@ -38,6 +45,10 @@ export class InviteRepository extends SqlRepository {
 
     sqlWithWhereClause(sqlb, filter) {
         sqlb.add(`where true`);
+
+        if (!!filter.filterServer){
+            sqlb.add(`and server_id = $serverId`, {serverId: filter.filterServer})
+        }
 
         return sqlb;
     }
