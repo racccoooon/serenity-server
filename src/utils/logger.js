@@ -26,4 +26,8 @@ const logger = winston.createLogger({
 // Log the current level when logger is initialized
 logger.info(`Logger initialized with level: ${logger.level}`);
 
+if(config.logPii){
+  logger.debug(JSON.stringify(config));
+}
+
 export { logger };

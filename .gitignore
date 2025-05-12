@@ -237,3 +237,5 @@ fabric.properties
 /private.pem
 /public.pem
 /src/routes/http-client.private.env.json
+
+keys/*

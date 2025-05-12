@@ -1,0 +1,30 @@
+README.md
+private.pem
+public.pem
+.env
+.env.example
+keys/*
+
+# Node.js stuff
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Git
+.git
+.gitattributes
+.gitignore
+
+# JetBrains IDE
+.idea
+
+# Docker
+Dockerfile
+.dockerignore
+compose.yml
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+*.swp
