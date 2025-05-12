@@ -35,8 +35,7 @@ export function createServer(fastify) {
                 requestDto?.description
             ));
 
-        reply.code(status.OK)
-            .send(new CreateServerResponse(server.id));
+        reply.code(status.OK).send({ id: server.id});
     });
 }
 

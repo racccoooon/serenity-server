@@ -39,11 +39,11 @@ export class UserAuthRepository extends SqlRepository {
     sqlWithWhereClause(sqlb, filter){
         sqlb.add('where true');
 
-        if (!!filter.filterUserId) {
+        if (filter.filterUserId !== undefined) {
             sqlb.add('and user_id = $userId', {userId: filter.filterUserId});
         }
 
-        if(!!filter.filterType) {
+        if (filter.filterType !== undefined) {
             sqlb.add('and type = $type', {type: filter.filterType});
         }
 

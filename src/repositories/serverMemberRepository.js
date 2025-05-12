@@ -33,11 +33,11 @@ export class ServerMemberRepository extends SqlRepository {
     sqlWithWhereClause(sqlb, filter) {
         sqlb.add('where true');
 
-        if (!!filter.filterUserId) {
+        if (filter.filterUserId !== undefined) {
             sqlb.add('and user_id = $userId', {userId: filter.filterUserId});
         }
 
-        if (!!filter.filterServerId) {
+        if (filter.filterServerId !== undefined) {
             sqlb.add('and user_id = $serverId', {serverId: filter.filterServerId});
         }
 

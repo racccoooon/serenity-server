@@ -46,7 +46,7 @@ export class SessionRepository extends SqlRepository {
     sqlWithWhereClause(sqlb, filter) {
         sqlb.add('where true');
 
-        if (!!filter.filterId) {
+        if (filter.filterId !== undefined) {
             sqlb.add('and id = $id', {id: filter.filterId});
         }
 

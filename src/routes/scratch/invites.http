@@ -1,0 +1,14 @@
+### Create invite
+POST localhost:5680/api/v1/servers/86e8eab3-b293-413d-873b-764666af8415/invites
+Authorization: {{bearer_token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+
+}
+
+### Get all invites in a server
+GET localhost:5680/api/v1/servers/86e8eab3-b293-413d-873b-764666af8415/invites
+Authorization: {{bearer_token}}
+Accept: application/json

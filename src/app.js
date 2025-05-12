@@ -22,6 +22,10 @@ import cron from 'node-cron';
 import {LogoutCommand, LogoutHandler} from "./commands/auth/logout.js";
 import {ServerMemberRepository} from "./repositories/serverMemberRepository.js";
 import {GetServersOfUserHandler, GetServersOfUserQuery} from "./queries/servers/getServersOfUser.js";
+import {GetPublicUserProfileHandler, GetPublicUserProfileQuery} from "./queries/users/getPublicUserProfile.js";
+import {InviteRepository} from "./repositories/inviteRepository.js";
+import {CreateInviteCommand, CreateInviteHandler} from "./commands/invite/createInvite.js";
+import {GetServerInvitesHandler, GetServerInvitesQuery} from "./queries/invites/getInvitesOfServer.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -50,6 +54,7 @@ container.registerTransient(UserAuthRepository, (c) => new UserAuthRepository(c.
 container.registerTransient(SessionRepository, (c) => new SessionRepository(c.resolve(DbTransaction)));
 container.registerTransient(ServerRepository, (c) => new ServerRepository(c.resolve(DbTransaction)));
 container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepository(c.resolve(DbTransaction)));
+container.registerTransient(InviteRepository, (c) => new InviteRepository(c.resolve(DbTransaction)));
 
 // commands and queries
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
@@ -76,6 +81,17 @@ container.registerTransient(GetServersOfUserHandler, (c) => new GetServersOfUser
     c.resolve(ServerRepository),
 ));
 
+container.registerTransient(GetPublicUserProfileHandler, (c) => new GetPublicUserProfileHandler(
+    c.resolve(UserRepository),
+));
+
+container.registerTransient(CreateInviteHandler, (c) => new CreateInviteHandler(
+    c.resolve(InviteRepository),
+));
+container.registerTransient(GetServerInvitesHandler, (c) => new GetServerInvitesHandler(
+    c.resolve(InviteRepository),
+));
+
 const mediatorBuilder = new MediatorBuilder();
 
 mediatorBuilder.register(RegisterUserCommand, (c) =>  c.resolve(RegisterUserHandler));
@@ -85,6 +101,11 @@ mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublic
 
 mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandler));
 mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUserHandler));
+
+mediatorBuilder.register(GetPublicUserProfileQuery, (c) => c.resolve(GetPublicUserProfileHandler));
+
+mediatorBuilder.register(CreateInviteCommand, (c) => c.resolve(CreateInviteHandler));
+mediatorBuilder.register(GetServerInvitesQuery, (c) => c.resolve(GetServerInvitesHandler));
 
 container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
 

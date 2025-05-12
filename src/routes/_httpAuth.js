@@ -2,11 +2,12 @@ import {AuthError} from "../errors/authError.js";
 import {SessionFilter, SessionRepository} from "../repositories/sessionRepository.js";
 import {createHash} from "crypto";
 import {DateTime} from "luxon";
+import {serenityClient} from "../client/index.js";
+import {config} from "../config/settings.js";
 
 export class AuthenticatedEntity {
-    constructor(type, id) {
+    constructor(type) {
         this.type = type;
-        this.id = id;
     }
 
     isLocalUser() {
@@ -15,6 +16,14 @@ export class AuthenticatedEntity {
 
     isRemoteUser() {
         return this.type === 'remote_user';
+    }
+
+    isUser() {
+        return this.isLocalUser() || this.isRemoteUser();
+    }
+
+    isRemoteInstance() {
+        return this.type === 'remote_instance';
     }
 }
 
@@ -72,16 +81,55 @@ export async function authenticateEntity(request) {
         await sessionRepo.updateUsageAndValidUntil(new SessionFilter()
             .whereId(sessionId));
 
-        const authenticatedEntity = new AuthenticatedEntity('local_user', dbSession.userId);
+        const authenticatedEntity = new AuthenticatedEntity('local_user');
+        authenticatedEntity.id = dbSession.userId;
         authenticatedEntity.sessionId = dbSession.id;
         return authenticatedEntity;
     }
 
-    const signature = headers['x-signature'];
-    const certificate = headers['x-certificate'];
+    const signature = request.headers['x-signature'];
+    const certificate = request.headers['x-certificate'];
     if (signature && certificate) {
         //TODO: implement remote authentication + block list check
     }
 
+    const domain = request.headers['x-instance'];
+    if(signature && domain){
+        if(config.environment !== 'Development'){
+            let isValidDomain = false;
+            try{
+                isValidDomain = new URL(`https://${domain}`).hostname === domain;
+            } catch{
+                throw new AuthError();
+            }
+            if(!isValidDomain){
+                throw new AuthError();
+            }
+        }
+
+        // TODO: block list
+
+        let protocol = "https://";
+        if(config.environment === 'Development'){
+            protocol = "http://";
+        }
+
+        const pubKey = await serenityClient.get(
+            `${protocol}${domain}/.well-known/serenity/pubkey`
+        );
+        verifyRequestSignature(request, pubKey);
+
+        const authenticatedEntity = new AuthenticatedEntity('remote_instance');
+        authenticatedEntity.domain = domain;
+        return authenticatedEntity;
+    }
+
     throw new AuthError();
+}
+
+function verifyRequestSignature(request, pubKey){
+    console.log(pubKey);
+    console.log(request);
+
+    //TODO implement this
 }

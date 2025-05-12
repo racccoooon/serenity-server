@@ -15,6 +15,7 @@ export const config = {
     },
     logLevel: process.env.LOG_LEVEL || 'info',
     logPii: process.env.LOG_PII || true,
+    environment: process.env.ENVIRONMENT || 'Development',
     keyPair: {
         privateKeyPath: process.env.PRIV_KEY_PATH || './private.pem',
         pubKeyPath: process.env.PUB_KEY_PATH || './public.pem',
