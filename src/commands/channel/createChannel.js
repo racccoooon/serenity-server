@@ -18,7 +18,8 @@ export class CreateChannelHandler {
 
     async handle(command) {
         const group = await this.channelGroupRepository.first(new ChannelGroupFilter()
-            .whereId(command.serverId));
+            .whereId(command.groupId)
+            .whereServer(command.serverId));
         if(!group){
             throw new Error('Group not on server');
         }
