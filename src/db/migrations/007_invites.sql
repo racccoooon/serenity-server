@@ -1,5 +1,5 @@
 alter table users
-    add column is_local text not null default true;
+    add column is_local boolean not null default true;
 
 alter table users
     alter column is_local
