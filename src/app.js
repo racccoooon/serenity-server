@@ -28,6 +28,7 @@ import {CreateInviteCommand, CreateInviteHandler} from "./commands/invite/create
 import {GetServerInvitesHandler, GetServerInvitesQuery} from "./queries/invites/getInvitesOfServer.js";
 import {CreateChannelCommand, CreateChannelHandler} from "./commands/channel/createChannel.js";
 import {ChannelRepository} from "./repositories/channelRepository.js";
+import {GetChannelsInServerHandler, GetChannelsInServerQuery} from "./queries/channels/getChannelsInServer.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -87,6 +88,9 @@ container.registerTransient(GetServersOfUserHandler, (c) => new GetServersOfUser
 container.registerTransient(CreateChannelHandler, (c) => new CreateChannelHandler(
     c.resolve(ChannelRepository),
 ));
+container.registerTransient(GetChannelsInServerHandler, (c) => new GetChannelsInServerHandler(
+    c.resolve(ChannelRepository),
+));
 
 container.registerTransient(GetPublicUserProfileHandler, (c) => new GetPublicUserProfileHandler(
     c.resolve(UserRepository),
@@ -110,6 +114,7 @@ mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandl
 mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUserHandler));
 
 mediatorBuilder.register(CreateChannelCommand, (c) => c.resolve(CreateChannelHandler));
+mediatorBuilder.register(GetChannelsInServerQuery, (c) => c.resolve(GetChannelsInServerHandler));
 
 mediatorBuilder.register(GetPublicUserProfileQuery, (c) => c.resolve(GetPublicUserProfileHandler));
 

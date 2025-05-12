@@ -7,3 +7,8 @@ Content-Type: application/json
 {
   "name": "Bean channel"
 }
+
+### get channels in server
+GET localhost:5680/api/v1/servers/ac7d38cd-3ba5-4e6b-9f79-31005f530c47/channels
+Accept: application/json
+Authorization: {{bearer_token}}
