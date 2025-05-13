@@ -42,6 +42,10 @@ export class UserRepository extends SqlRepository {
             sqlb.add('and id = $id', {id: filter.filterId});
         }
 
+        if (filter.filterUsername !== undefined) {
+            sqlb.add(`and username = $username`, {username: filter.filterUsername});
+        }
+
         return sqlb;
     }
 

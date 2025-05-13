@@ -3,7 +3,7 @@ import {logout, makePublicToken, passwordLogin, registerUser} from './auth.js';
 import {createServer, getJoinedServers} from "./servers.js";
 import {getPublicKey} from "./wellKnown.js";
 import {getPublicUserProfile} from "./users.js";
-import {createInvite, listServerInvites} from "./invites.js";
+import {createInvite, joinServer, listServerInvites} from "./invites.js";
 import {createChannel, createChannelGroup, getChannelGroupsInServer, getChannelsInServer} from "./channels.js";
 import {createMessage} from "./messages.js";
 
@@ -38,6 +38,7 @@ export function routes(fastify, options) {
   // invite routes
   createInvite(fastify);
   listServerInvites(fastify);
+  joinServer(fastify);
 
   // user routes
   getPublicUserProfile(fastify);

@@ -6,6 +6,11 @@ export class InviteFilter {
         this.filterServer = serverId;
         return this;
     }
+
+    whereId(id){
+        this.filterId = id;
+        return this;
+    }
 }
 
 export class InviteRepository extends SqlRepository {
@@ -48,6 +53,10 @@ export class InviteRepository extends SqlRepository {
 
         if (filter.filterServer !== undefined){
             sqlb.add(`and server_id = $serverId`, {serverId: filter.filterServer})
+        }
+
+        if(filter.filterId !== undefined) {
+            sqlb.add(`and id = $id`, {id: filter.filterId});
         }
 
         return sqlb;

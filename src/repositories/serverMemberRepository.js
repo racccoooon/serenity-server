@@ -38,7 +38,7 @@ export class ServerMemberRepository extends SqlRepository {
         }
 
         if (filter.filterServerId !== undefined) {
-            sqlb.add('and user_id = $serverId', {serverId: filter.filterServerId});
+            sqlb.add('and server_id = $serverId', {serverId: filter.filterServerId});
         }
 
         return sqlb;

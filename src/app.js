@@ -37,6 +37,7 @@ import {
 } from "./queries/channelGroup/getChannelGroupsInServer.js";
 import {CreateMessageCommand, CreateMessageHandler} from "./commands/message/createMessage.js";
 import {MessageRepository} from "./repositories/messageRepository.js";
+import {JoinServerCommand, JoinServerHandler} from "./commands/invite/joinServer.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -125,6 +126,10 @@ container.registerTransient(CreateInviteHandler, (c) => new CreateInviteHandler(
 container.registerTransient(GetServerInvitesHandler, (c) => new GetServerInvitesHandler(
     c.resolve(InviteRepository),
 ));
+container.registerTransient(JoinServerHandler, (c) => new JoinServerHandler(
+    c.resolve(InviteRepository),
+    c.resolve(ServerMemberRepository),
+));
 
 const mediatorBuilder = new MediatorBuilder();
 
@@ -148,6 +153,7 @@ mediatorBuilder.register(GetPublicUserProfileQuery, (c) => c.resolve(GetPublicUs
 
 mediatorBuilder.register(CreateInviteCommand, (c) => c.resolve(CreateInviteHandler));
 mediatorBuilder.register(GetServerInvitesQuery, (c) => c.resolve(GetServerInvitesHandler));
+mediatorBuilder.register(JoinServerCommand, (c) => c.resolve(JoinServerHandler));
 
 container.registerScoped(Mediator, (c) => mediatorBuilder.build(c));
 
