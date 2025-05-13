@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 import {CreateInviteCommand, CreateInviteHandler} from "../createInvite.js";
 import {v4} from "uuid";
 
-test('foo', async () => {
+test('create public invite', async () => {
     // arrange
     const inviteRepo = {
         add: jest.fn(),

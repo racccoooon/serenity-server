@@ -35,6 +35,8 @@ import {
     GetChannelGroupsInServerHandler,
     GetChannelGroupsInServerQuery
 } from "./queries/channelGroup/getChannelGroupsInServer.js";
+import {CreateMessageCommand, CreateMessageHandler} from "./commands/message/createMessage.js";
+import {MessageRepository} from "./repositories/messageRepository.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -66,6 +68,7 @@ container.registerTransient(ServerMemberRepository, (c) => new ServerMemberRepos
 container.registerTransient(InviteRepository, (c) => new InviteRepository(c.resolve(DbTransaction)));
 container.registerTransient(ChannelGroupRepository, (c) => new ChannelGroupRepository(c.resolve(DbTransaction)));
 container.registerTransient(ChannelRepository, (c) => new ChannelRepository(c.resolve(DbTransaction)));
+container.registerTransient(MessageRepository, (c) => new MessageRepository(c.resolve(DbTransaction)));
 
 // commands and queries
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
@@ -108,6 +111,10 @@ container.registerTransient(GetChannelsInServerHandler, (c) => new GetChannelsIn
     c.resolve(ChannelRepository),
 ));
 
+container.registerTransient(CreateMessageHandler, (c) => new CreateMessageHandler(
+    c.resolve(MessageRepository),
+));
+
 container.registerTransient(GetPublicUserProfileHandler, (c) => new GetPublicUserProfileHandler(
     c.resolve(UserRepository),
 ));
@@ -134,6 +141,8 @@ mediatorBuilder.register(GetChannelGroupsInServerQuery, (c) => c.resolve(GetChan
 
 mediatorBuilder.register(CreateChannelCommand, (c) => c.resolve(CreateChannelHandler));
 mediatorBuilder.register(GetChannelsInServerQuery, (c) => c.resolve(GetChannelsInServerHandler));
+
+mediatorBuilder.register(CreateMessageCommand, (c) => c.resolve(CreateMessageHandler));
 
 mediatorBuilder.register(GetPublicUserProfileQuery, (c) => c.resolve(GetPublicUserProfileHandler));
 
