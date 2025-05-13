@@ -1,0 +1,12 @@
+### Create invite
+POST localhost:5680/api/v1/servers/86e8eab3-b293-413d-873b-764666af8415/channels/089593dc-51d9-4ff2-ad46-401049af5585/messages
+Authorization: {{bearer_token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "type": "text",
+  "details": {
+    "content": "Hello World!"
+  }
+}
