@@ -1,6 +1,7 @@
 import {AuthError} from "../errors/authError.js";
 import {logger} from "../utils/logger.js";
 import {DbTransaction} from "../db/index.js";
+import {HttpError} from "../errors/httpError.js";
 
 export default async function errorHandler(error, request, reply) {
     // we roll back any potential existing transaction
@@ -9,6 +10,10 @@ export default async function errorHandler(error, request, reply) {
 
     if (error instanceof AuthError) {
         return reply.code(401).send();
+    }
+
+    if (error instanceof HttpError){
+        return reply.code(error.status).send(error.message);
     }
 
     // validation error

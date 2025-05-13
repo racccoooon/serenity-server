@@ -6,8 +6,6 @@ import {logger} from '../utils/logger.js';
 
 const {Pool} = pg;
 
-console.log(config.db.host);
-
 export const pool = new Pool(config.db);
 
 // Add error handling for the pool

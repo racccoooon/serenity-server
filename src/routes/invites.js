@@ -6,6 +6,7 @@ import {status} from "http-status";
 import {Mediator} from "../mediator/index.js";
 import {CreateInviteCommand} from "../commands/invite/createInvite.js";
 import {GetServerInvitesQuery} from "../queries/invites/getInvitesOfServer.js";
+import {JoinServerCommand} from "../commands/invite/joinServer.js";
 
 export function listServerInvites(fastify) {
     fastify.get('/api/v1/servers/:serverId/invites',
@@ -19,6 +20,21 @@ export function listServerInvites(fastify) {
                 ));
 
             reply.send(response);
+        });
+}
+
+export function joinServer(fastify) {
+    fastify.post(`/api/v1/servers/:serverId/invites/:inviteId/join`,
+        async (request, reply) => {
+            const entity = await authenticateEntity(request);
+            if (!entity.isUser()) throw new AuthError();
+
+            await request.scope.resolve(Mediator)
+                .send(new JoinServerCommand(
+                   request.params.serverId,
+                   request.params.inviteId,
+                   entity.id,
+                ));
         });
 }
 
