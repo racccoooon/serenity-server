@@ -1,5 +1,5 @@
 ### create a channel group on a server
-POST localhost:5680/api/v1/servers/ac7d38cd-3ba5-4e6b-9f79-31005f530c47/channel-groups
+POST localhost:5680/api/v1/servers/d9bb12bc-c9d1-4391-906c-829d6682f6dc/channel-groups
 Accept: application/json
 Authorization: {{bearer_token}}
 Content-Type: application/json
@@ -8,8 +8,18 @@ Content-Type: application/json
   "name": "raccon2 group"
 }
 
+### update a channel group on a server
+PATCH localhost:5680/api/v1/servers/d9bb12bc-c9d1-4391-906c-829d6682f6dc/channel-groups/5392a54a-954d-4e13-9117-c319d32a481d
+Accept: application/json
+Authorization: {{bearer_token}}
+Content-Type: application/json
+
+{
+  "name": "raccon1 group"
+}
+
 ### get channel groups in server
-GET localhost:5680/api/v1/servers/ac7d38cd-3ba5-4e6b-9f79-31005f530c47/channel-groups
+GET localhost:5680/api/v1/servers/d9bb12bc-c9d1-4391-906c-829d6682f6dc/channel-groups
 Accept: application/json
 Authorization: {{bearer_token}}
 

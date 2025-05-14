@@ -72,6 +72,20 @@ export class ChannelGroupRepository extends SqlRepository {
         return sqlb;
     }
 
+    async update(group){
+        const {id, ...values} = group;
+        if(Object.entries(values).length === 0) return;
+
+        const sqlb = new Sqlb(`update channel_groups set`);
+
+        if(values.name !== undefined) {
+            sqlb.add(`name = $name`, {name: values.name});
+        }
+
+        sqlb.add(`where id = $id`, {id: id});
+        await this.execute(sqlb);
+    }
+
     async getBiggestRank(serverId) {
         const sqlb = new Sqlb(`
                     select rank
