@@ -1,11 +1,11 @@
 ### create a channel group on a server
-POST localhost:5680/api/v1/servers/d9bb12bc-c9d1-4391-906c-829d6682f6dc/channel-groups
+POST localhost:5680/api/v1/servers/ba9ca2fa-2b86-4c2a-97c0-751c1ed8dd0f/channel-groups
 Accept: application/json
 Authorization: {{bearer_token}}
 Content-Type: application/json
 
 {
-  "name": "raccon2 group"
+  "name": "we scream into the void"
 }
 
 ### update a channel group on a server
@@ -18,6 +18,11 @@ Content-Type: application/json
   "name": "raccon1 group"
 }
 
+### delete a channel group on a server
+DELETE localhost:5680/api/v1/servers/ba9ca2fa-2b86-4c2a-97c0-751c1ed8dd0f/channel-groups/d5258cc0-7997-4ddb-8ee5-cdb5e35efd53
+Accept: application/json
+Authorization: {{bearer_token}}
+
 ### get channel groups in server
 GET localhost:5680/api/v1/servers/d9bb12bc-c9d1-4391-906c-829d6682f6dc/channel-groups
 Accept: application/json
@@ -25,14 +30,14 @@ Authorization: {{bearer_token}}
 
 
 ### create a channel in the default group (none)
-POST localhost:5680/api/v1/servers/ac7d38cd-3ba5-4e6b-9f79-31005f530c47/channels
+POST localhost:5680/api/v1/servers/ba9ca2fa-2b86-4c2a-97c0-751c1ed8dd0f/channels
 Accept: application/json
 Authorization: {{bearer_token}}
 Content-Type: application/json
 
 {
-  "name": "Raccoon channel",
-  "groupId": "0352388e-308c-4e0e-9e98-c626b4355b0b"
+  "name": "foo",
+  "groupId": "d5258cc0-7997-4ddb-8ee5-cdb5e35efd53"
 }
 
 ### get channels in server

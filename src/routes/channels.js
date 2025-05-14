@@ -8,6 +8,7 @@ import {GetChannelsInServerQuery} from "../queries/channels/getChannelsInServer.
 import {CreateChannelGroupCommand} from "../commands/channelGroup/createChannelGroup.js";
 import {GetChannelGroupsInServerQuery} from "../queries/channelGroup/getChannelGroupsInServer.js";
 import {UpdateChannelGroupCommand} from "../commands/channelGroup/updateChannelGroup.js";
+import {DeleteChannelGroupCommand} from "../commands/channelGroup/deleteChannelGroup.js";
 
 const createChannelGroupSchema = z.object({
     name: z.string().max(63).nonempty(),
@@ -49,12 +50,30 @@ export function updateChannelGroup(fastify) {
 
         const requestDto = request.body;
 
-        const channelGroup = await request.scope.resolve(Mediator)
+        await request.scope.resolve(Mediator)
             .send(new UpdateChannelGroupCommand(
                 request.params.groupId,
                 requestDto.name,
             ))
+
+        reply.send(status.NO_CONTENT);
     });
+}
+
+export function deleteChannelGroup(fastify) {
+    fastify.delete('/api/v1/servers/:serverId/channel-groups/:groupId',
+        async (request, reply) => {
+            const entity = await authenticateEntity(request);
+            if (!entity.isUser()) throw new AuthError();
+
+            await request.scope.resolve(Mediator)
+                .send(new DeleteChannelGroupCommand(
+                    request.params.serverId,
+                    request.params.groupId,
+                ));
+
+            reply.send(status.NO_CONTENT);
+        });
 }
 
 export function getChannelGroupsInServer(fastify) {

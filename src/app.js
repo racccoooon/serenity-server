@@ -39,6 +39,7 @@ import {CreateMessageCommand, CreateMessageHandler} from "./commands/message/cre
 import {MessageRepository} from "./repositories/messageRepository.js";
 import {UpdateChannelGroupCommand, UpdateChannelGroupHandler} from "./commands/channelGroup/updateChannelGroup.js";
 import {JoinServerCommand, JoinServerHandler} from "./commands/invite/joinServer.js";
+import {DeleteChannelGroupCommand, DeleteChannelGroupHandler} from "./commands/channelGroup/deleteChannelGroup.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -104,6 +105,10 @@ container.registerTransient(CreateChannelGroupHandler, (c) => new CreateChannelG
 container.registerTransient(UpdateChannelGroupHandler, (c) => new UpdateChannelGroupHandler(
     c.resolve(ChannelGroupRepository),
 ));
+container.registerTransient(DeleteChannelGroupHandler, (c) => new DeleteChannelGroupHandler(
+    c.resolve(ChannelGroupRepository),
+    c.resolve(ChannelRepository),
+));
 container.registerTransient(GetChannelGroupsInServerHandler, (c) => new GetChannelGroupsInServerHandler(
     c.resolve(ChannelGroupRepository),
 ));
@@ -147,6 +152,7 @@ mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUse
 
 mediatorBuilder.register(CreateChannelGroupCommand, (c) => c.resolve(CreateChannelGroupHandler));
 mediatorBuilder.register(UpdateChannelGroupCommand, (c) => c.resolve(UpdateChannelGroupHandler));
+mediatorBuilder.register(DeleteChannelGroupCommand, (c) => c.resolve(DeleteChannelGroupHandler));
 mediatorBuilder.register(GetChannelGroupsInServerQuery, (c) => c.resolve(GetChannelGroupsInServerHandler));
 
 mediatorBuilder.register(CreateChannelCommand, (c) => c.resolve(CreateChannelHandler));
