@@ -37,6 +37,7 @@ import {
 } from "./queries/channelGroup/getChannelGroupsInServer.js";
 import {CreateMessageCommand, CreateMessageHandler} from "./commands/message/createMessage.js";
 import {MessageRepository} from "./repositories/messageRepository.js";
+import {UpdateChannelGroupCommand, UpdateChannelGroupHandler} from "./commands/channelGroup/updateChannelGroup.js";
 import {JoinServerCommand, JoinServerHandler} from "./commands/invite/joinServer.js";
 
 const fastify = Fastify({logger: false});
@@ -100,6 +101,9 @@ container.registerTransient(GetServersOfUserHandler, (c) => new GetServersOfUser
 container.registerTransient(CreateChannelGroupHandler, (c) => new CreateChannelGroupHandler(
     c.resolve(ChannelGroupRepository),
 ));
+container.registerTransient(UpdateChannelGroupHandler, (c) => new UpdateChannelGroupHandler(
+    c.resolve(ChannelGroupRepository),
+));
 container.registerTransient(GetChannelGroupsInServerHandler, (c) => new GetChannelGroupsInServerHandler(
     c.resolve(ChannelGroupRepository),
 ));
@@ -142,6 +146,7 @@ mediatorBuilder.register(CreateServerCommand, (c) => c.resolve(CreateServerHandl
 mediatorBuilder.register(GetServersOfUserQuery, (c) => c.resolve(GetServersOfUserHandler));
 
 mediatorBuilder.register(CreateChannelGroupCommand, (c) => c.resolve(CreateChannelGroupHandler));
+mediatorBuilder.register(UpdateChannelGroupCommand, (c) => c.resolve(UpdateChannelGroupHandler));
 mediatorBuilder.register(GetChannelGroupsInServerQuery, (c) => c.resolve(GetChannelGroupsInServerHandler));
 
 mediatorBuilder.register(CreateChannelCommand, (c) => c.resolve(CreateChannelHandler));

@@ -4,7 +4,13 @@ import {createServer, getJoinedServers} from "./servers.js";
 import {getPublicKey} from "./wellKnown.js";
 import {getPublicUserProfile} from "./users.js";
 import {createInvite, joinServer, listServerInvites} from "./invites.js";
-import {createChannel, createChannelGroup, getChannelGroupsInServer, getChannelsInServer} from "./channels.js";
+import {
+  createChannel,
+  createChannelGroup,
+  getChannelGroupsInServer,
+  getChannelsInServer,
+  updateChannelGroup
+} from "./channels.js";
 import {createMessage} from "./messages.js";
 
 export function routes(fastify, options) {
@@ -28,7 +34,9 @@ export function routes(fastify, options) {
 
   // channel routes
   createChannelGroup(fastify);
+  updateChannelGroup(fastify);
   getChannelGroupsInServer(fastify);
+
   createChannel(fastify);
   getChannelsInServer(fastify);
 
