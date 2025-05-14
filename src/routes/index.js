@@ -6,7 +6,7 @@ import {getPublicUserProfile} from "./users.js";
 import {createInvite, joinServer, listServerInvites} from "./invites.js";
 import {
   createChannel,
-  createChannelGroup,
+  createChannelGroup, deleteChannelGroup,
   getChannelGroupsInServer,
   getChannelsInServer,
   updateChannelGroup
@@ -35,6 +35,7 @@ export function routes(fastify, options) {
   // channel routes
   createChannelGroup(fastify);
   updateChannelGroup(fastify);
+  deleteChannelGroup(fastify);
   getChannelGroupsInServer(fastify);
 
   createChannel(fastify);

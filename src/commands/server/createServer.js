@@ -1,4 +1,5 @@
 import {v4} from "uuid";
+import {LexoRank} from "lexorank";
 
 export class CreateServerCommand {
     constructor(ownerId, name, description) {
@@ -32,6 +33,15 @@ export class CreateServerHandler {
         };
 
         await this.serverRepository.add(server);
+
+        await this.channelGroupRepository.add({
+            id: v4(),
+            serverId: server.id,
+            name: "",
+            rank: LexoRank.min().toString(),
+            isDefault: true,
+        });
+
         await this.serverMemberRepository.add({
             id: v4(),
             userId: command.ownerId,

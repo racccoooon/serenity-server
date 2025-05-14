@@ -16,15 +16,25 @@ export class ChannelGroupFilter {
         this.filterName = name;
         return this;
     }
+
+    whereIsDefault() {
+        this.filterDefault = true;
+        return this;
+    }
+
+    orderByRank() {
+        this.ordering = {column: "rank", direction: "asc"};
+        return this;
+    }
 }
 
 export class ChannelGroupRepository extends SqlRepository {
     get insertIntoSql() {
-        return `insert into channel_groups (id, server_id, name, rank)`;
+        return `insert into channel_groups (id, server_id, name, rank, is_default)`;
     }
 
     get insertRowSql() {
-        return `($id, $serverId, $name, $rank)`;
+        return `($id, $serverId, $name, $rank, $isDefault)`;
     }
 
     mapToTable(model) {
@@ -33,6 +43,7 @@ export class ChannelGroupRepository extends SqlRepository {
             serverId: model.serverId,
             name: model.name,
             rank: model.rank,
+            isDefault: model.isDefault,
         };
     }
 
@@ -47,6 +58,7 @@ export class ChannelGroupRepository extends SqlRepository {
             serverId: row.server_id,
             name: row.name,
             rank: row.rank,
+            isDefault: row.is_default,
         };
     }
 
@@ -67,6 +79,10 @@ export class ChannelGroupRepository extends SqlRepository {
 
         if(filter.filterName !== undefined){
             sqlb.add(`and name = $name`, {name: filter.filterName});
+        }
+
+        if(filter.ordering !== undefined) {
+            sqlb.add(`order by ` + filter.ordering.column + ` ` + filter.ordering.direction);
         }
 
         return sqlb;

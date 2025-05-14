@@ -15,15 +15,14 @@ export class CreateChannelGroupHandler{
 
     async handle(command){
         const biggestRank = await this.channelGroupRepository.getBiggestRank(command.serverId);
-        const lexoRank = (biggestRank !== null)
-            ? LexoRank.parse(biggestRank).genNext().toString()
-            : LexoRank.min().toString();
+        const lexoRank = LexoRank.parse(biggestRank).genNext().toString();
 
         const channelGroup = {
             id: v4(),
             serverId: command.serverId,
             name: command.name,
             rank: lexoRank,
+            isDefault: false,
         };
 
         await this.channelGroupRepository.add(channelGroup);
