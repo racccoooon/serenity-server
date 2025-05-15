@@ -1,5 +1,5 @@
 import {SqlRepository} from "./_sqlRepository.js";
-import {Sqlb} from "./_sqlb.js";
+import {sql} from "./_shrimple.js";
 
 export class ChannelFilter {
     whereChannelGroup(groupId) {
@@ -15,25 +15,16 @@ export class ChannelFilter {
 
 export class ChannelRepository extends SqlRepository {
     get insertIntoSql() {
-        return `insert into channels (id, group_id, name, rank)`;
-    }
-
-    get insertRowSql() {
-        return `($id, $groupId, $name, $rank)`;
+        return sql`insert into channels (id, group_id, name, rank)`;
     }
 
     mapToTable(model) {
-        return {
-            id: model.id,
-            groupId: model.groupId,
-            name: model.name,
-            rank: model.rank,
-        };
+        return sql`(${model.id}, ${model.groupId}, ${model.name}, ${model.rank})`;
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`select c.*
-                                                 from channels as c`), filter);
+        return this.sqlWithWhereClause(sql`select c.*
+                                                 from channels as c`, filter);
     }
 
     mapFromTable(row) {
@@ -46,59 +37,63 @@ export class ChannelRepository extends SqlRepository {
     }
 
     buildDeleteFromFilter(filter) {
-        return this.buildSelectFromFilter(new Sqlb(`delete
-                                                    from channels`), filter)
+        return this.buildSelectFromFilter(sql`delete
+                                              from channels`, filter)
     }
 
-    sqlWithWhereClause(sqlb, filter) {
+    sqlWithWhereClause(shrimple, filter) {
         if(filter.filterServer !== undefined){
-            sqlb.add(`join channel_groups g on c.group_id = g.id`)
+            shrimple.append`join channel_groups g on c.group_id = g.id`
         }
 
-        sqlb.add(`where true`);
+        const clauses = [];
 
         if (filter.filterGroup !== undefined) {
-            sqlb.add(`and c.group_id = $groupId`, {groupId: filter.filterGroup});
+            clauses.push(sql`c.group_id = ${filter.filterGroup}`);
         }
 
         if(filter.filterServer !== undefined){
-            sqlb.add(`and g.server_id = $serverId`, {serverId: filter.filterServer});
+            clauses.push(sql`g.server_id = ${filter.filterServer}`);
         }
 
-        return sqlb;
+        shrimple.appendMany(clauses, 'and', 'where');
+
+        return shrimple;
     }
 
     async update(channel){
-        const {id, ...values} = channel;
-        if(Object.entries(values).length === 0) return;
+        const setters = [];
 
-        const sqlb = new Sqlb(`update channels set`);
-
-        if(values.name !== undefined) {
-            sqlb.add(`name = $name`, {name: values.name});
+        if(channel.name !== undefined) {
+            setters.push(sql`name = ${channel.name}`);
         }
 
-        if(values.groupId !== undefined) {
-            sqlb.add(`group_id = $groupId, `, {groupId: values.groupId});
+        if(channel.groupId !== undefined) {
+            setters.push(sql`group_id = ${channel.groupId}`);
         }
 
-        if(values.rank !== undefined) {
-            sqlb.add(`rank = $rank`, {rank: values.rank});
+        if(channel.rank !== undefined) {
+            setters.push(sql`rank = ${channel.rank}`);
         }
 
-        sqlb.add(`where id = $id`, {id: id});
-        await this.execute(sqlb);
+        if (setters.length === 0) return;
+
+        const shrimple = sql`update channels set`;
+        shrimple.appendMany(setters, ',');
+
+        shrimple.append`where id = ${channel.id}`;
+
+        await this.execute(shrimple);
     }
 
     async getBiggestRank(groupId) {
-        const sqlb = new Sqlb(`
+        const shrimple = sql`
                     select rank
                     from channels
-                    where group_id = $groupId
-                    order by rank desc limit 1`,
-            {groupId: groupId});
+                    where group_id = ${groupId}
+                    order by rank desc limit 1`;
 
-        const result = await this.execute(sqlb);
+        const result = await this.execute(shrimple);
         return result.rows.map(row => row.rank)[0] ?? null;
     }
 }
