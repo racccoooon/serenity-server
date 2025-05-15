@@ -8,3 +8,10 @@ services:
       POSTGRES_DB: serenity
     ports:
       - "7891:5432"
+
+  redis:
+    image: redis:8.0.1
+    ports:
+      - "7892:6379"
+    command: ["redis-server", "--save", "300", "1", "--save", "60", "10000"]
+    restart: unless-stopped
