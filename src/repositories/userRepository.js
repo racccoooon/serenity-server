@@ -1,5 +1,6 @@
 import {Sqlb} from "./_sqlb.js";
 import {SqlRepository} from "./_sqlRepository.js";
+import {sql} from "./_shrimple.js";
 
 export class UserFilter {
     whereId(id) {
@@ -15,38 +16,31 @@ export class UserFilter {
 
 export class UserRepository extends SqlRepository {
     get insertIntoSql() {
-        return 'insert into users (id, username, email, is_local)';
-    }
-
-    get insertRowSql() {
-        return '($id, $username, $email, $isLocal)';
+        return sql`insert into users (id, username, email, is_local)`;
     }
 
     mapToTable(model) {
-        return {
-            id: model.id,
-            username: model.username,
-            email: model.email,
-            isLocal: model.isLocal,
-        };
+        return sql`(${model.id}, ${model.username}, ${model.email}, ${model.isLocal})`;
     }
 
     buildSelectFromFilter(filter){
-        return this.sqlWithWhereClause(new Sqlb('select * from users'), filter);
+        return this.sqlWithWhereClause(sql`select * from users`, filter);
     }
 
-    sqlWithWhereClause(sqlb, filter){
-        sqlb.add('where true');
+    sqlWithWhereClause(shrimple, filter){
+        const clauses = [];
 
         if (filter.filterId !== undefined) {
-            sqlb.add('and id = $id', {id: filter.filterId});
+            clauses.push(sql`id = ${filter.filterId}`);
         }
 
         if (filter.filterUsername !== undefined) {
-            sqlb.add(`and username = $username`, {username: filter.filterUsername});
+            clauses.push(sql`username = ${filter.filterUsername}`);
         }
 
-        return sqlb;
+        shrimple.appendMany(clauses, 'and', 'where');
+
+        return shrimple;
     }
 
     mapFromTable(row) {

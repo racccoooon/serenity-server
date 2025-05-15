@@ -1,4 +1,5 @@
 import {SqlRepository} from "./_sqlRepository.js";
+import {sql} from "./_shrimple.js";
 
 export class MessageFilter {
     whereChannel(channelId) {
@@ -9,25 +10,15 @@ export class MessageFilter {
 
 export class MessageRepository extends SqlRepository{
     get insertIntoSql() {
-        return `insert into messages (id, channel_id, user_id, type, details)`;
-    }
-
-    get insertRowSql() {
-        return `($id, $channelId, $userId, $type, $details)`;
+        return sql`insert into messages (id, channel_id, user_id, type, details)`;
     }
 
     mapToTable(model) {
-        return {
-            id: model.id,
-            channelId: model.channelId,
-            userId: model.userId,
-            type: model.type,
-            details: model.details,
-        };
+        return sql`(${model.id}, ${model.channelId}, ${model.userId}, ${model.type}, ${model.details})`;
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`select * from messages`), filter);
+        return this.sqlWithWhereClause(sql`select * from messages`, filter);
     }
 
     mapFromTable(row) {
@@ -41,16 +32,17 @@ export class MessageRepository extends SqlRepository{
     }
 
     buildDeleteFromFilter(filter) {
-        return this.buildSelectFromFilter(new Sqlb(`delete from messages`), filter);
+        return this.buildSelectFromFilter(sql`delete from messages`, filter);
     }
 
-    sqlWithWhereClause(sqlb, filter) {
-        sqlb.add(`where true`);
+    sqlWithWhereClause(shrimple, filter) {
+        const clauses = [];
 
         if(filter.filterChannel !== undefined){
-            sqlb.add(`and channel_id = $channelId`, { channelId: filter.filterChannel});
+            clauses.push(sql`channel_id = ${filter.filterChannel}`);
         }
 
-        return sqlb;
+        shrimple.appendMany(clauses, 'and', 'where');
+        return shrimple;
     }
 }

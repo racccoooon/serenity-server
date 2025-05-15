@@ -1,5 +1,5 @@
 import {SqlRepository} from "./_sqlRepository.js";
-import {Sqlb} from "./_sqlb.js";
+import {sql} from "./_shrimple.js";
 
 export class ChannelGroupFilter {
     whereId(id) {
@@ -30,26 +30,15 @@ export class ChannelGroupFilter {
 
 export class ChannelGroupRepository extends SqlRepository {
     get insertIntoSql() {
-        return `insert into channel_groups (id, server_id, name, rank, is_default)`;
-    }
-
-    get insertRowSql() {
-        return `($id, $serverId, $name, $rank, $isDefault)`;
+        return sql`insert into channel_groups (id, server_id, name, rank, is_default)`;
     }
 
     mapToTable(model) {
-        return {
-            id: model.id,
-            serverId: model.serverId,
-            name: model.name,
-            rank: model.rank,
-            isDefault: model.isDefault,
-        };
+        return sql`(${model.id}, ${model.serverId}, ${model.name}, ${model.rank}, ${model.isDefault})`
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`select *
-                                                 from channel_groups`), filter);
+        return this.sqlWithWhereClause(sql`select * from channel_groups`, filter);
     }
 
     mapFromTable(row) {
@@ -63,55 +52,62 @@ export class ChannelGroupRepository extends SqlRepository {
     }
 
     buildDeleteFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`delete from channel_groups`), filter);
+        return this.sqlWithWhereClause(sql`delete from channel_groups`, filter);
     }
 
-    sqlWithWhereClause(sqlb, filter) {
-        sqlb.add(`where true`);
+    sqlWithWhereClause(shrimple, filter) {
+        const clauses = [];
 
         if (filter.filterId !== undefined) {
-            sqlb.add(`and id = $id`, {id: filter.filterId});
+            clauses.push(sql`id = ${filter.filterId}`);
         }
 
         if(filter.filterServer !== undefined){
-            sqlb.add(`and server_id = $serverId`, {serverId: filter.filterServer});
+            clauses.push(sql`server_id = ${filter.filterServer}`);
         }
 
         if(filter.filterName !== undefined){
-            sqlb.add(`and name = $name`, {name: filter.filterName});
+            clauses.push(sql`name = ${filter.filterName}`);
         }
+
+        shrimple.appendMany(clauses, 'and', 'where');
 
         if(filter.ordering !== undefined) {
-            sqlb.add(`order by ` + filter.ordering.column + ` ` + filter.ordering.direction);
+            shrimple.append`order by ${sql.raw(filter.ordering.column)} ${sql.raw(filter.ordering.direction)}`;
         }
 
-        return sqlb;
+        return shrimple;
     }
 
     async update(group){
-        const {id, ...values} = group;
-        if(Object.entries(values).length === 0) return;
+        const setters = [];
 
-        const sqlb = new Sqlb(`update channel_groups set`);
-
-        if(values.name !== undefined) {
-            sqlb.add(`name = $name`, {name: values.name});
+        if(group.name !== undefined) {
+            setters.push(sql`name = ${group.name}`);
         }
 
-        sqlb.add(`where id = $id`, {id: id});
-        await this.execute(sqlb);
+        if (setters.length === 0) {
+            return;
+        }
+
+        const shrimple = sql`update channel_groups set`;
+
+        shrimple.appendMany(setters, ',');
+
+        shrimple.append`where id = ${group.id}`;
+
+        await this.execute(shrimple);
     }
 
     async getBiggestRank(serverId) {
-        const sqlb = new Sqlb(`
+        const shrimple = sql`
                     select rank
                     from channel_groups
-                    where server_id = $serverId`,
-            {serverId: serverId});
+                    where server_id = ${serverId}`;
 
-        sqlb.add(`order by rank desc limit 1`);
+        shrimple.append`order by rank desc limit 1`;
 
-        const result = await this.execute(sqlb);
+        const result = await this.execute(shrimple);
         return result.rows.map(row => row.rank)[0] ?? null;
     }
 }

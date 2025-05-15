@@ -1,5 +1,5 @@
 import {SqlRepository} from "./_sqlRepository.js";
-import {Sqlb} from "./_sqlb.js";
+import {sql} from "./_shrimple.js";
 
 export class ServerMemberFilter {
     whereServerId(serverId){
@@ -15,37 +15,31 @@ export class ServerMemberFilter {
 
 export class ServerMemberRepository extends SqlRepository {
     get insertIntoSql() {
-        return `insert into server_members (id, user_id, server_id)`
-    }
-
-    get insertRowSql() {
-        return `($id, $userId, $serverId)`;
+        return sql`insert into server_members (id, user_id, server_id)`
     }
 
     mapToTable(model) {
-        return {
-            id: model.id,
-            userId: model.userId,
-            serverId: model.serverId,
-        };
+        return sql`(${model.id}, ${model.userId}, ${model.serverId})`
     }
 
-    sqlWithWhereClause(sqlb, filter) {
-        sqlb.add('where true');
+    sqlWithWhereClause(shrimple, filter) {
+        const clauses = []
 
         if (filter.filterUserId !== undefined) {
-            sqlb.add('and user_id = $userId', {userId: filter.filterUserId});
+            clauses.push(sql`user_id = ${filter.filterUserId}`);
         }
 
         if (filter.filterServerId !== undefined) {
-            sqlb.add('and server_id = $serverId', {serverId: filter.filterServerId});
+            clauses.push(sql`server_id = ${filter.filterServerId}`);
         }
 
-        return sqlb;
+        shrimple.appendMany(clauses, 'and', 'where');
+
+        return shrimple;
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`select * from server_members`), filter);
+        return this.sqlWithWhereClause(sql`select * from server_members`, filter);
     }
 
     mapFromTable(row) {
@@ -57,6 +51,6 @@ export class ServerMemberRepository extends SqlRepository {
     }
 
     buildDeleteFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`delete from server_members`), filter);
+        return this.sqlWithWhereClause(sql`delete from server_members`, filter);
     }
 }

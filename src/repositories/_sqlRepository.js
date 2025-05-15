@@ -2,14 +2,18 @@ import {logger} from "../utils/logger.js";
 import {chunked, isLastIndex} from "../utils/index.js";
 import {Sqlb} from "./_sqlb.js";
 import {config} from "../config/settings.js";
+import {sql} from "./_shrimple.js";
 
 export class SqlRepository {
     constructor(dbTransaction) {
         this.dbTransaction = dbTransaction;
     }
 
-    async execute(sqlb) {
-        const {sql, params} = sqlb.build();
+    /**
+     * @param {ShrimpleSql} shrimple
+     */
+    async execute(shrimple) {
+        const {sql, params} = shrimple.build();
 
         const meta = {sql: sql};
         if(config.logPii){
@@ -22,14 +26,16 @@ export class SqlRepository {
         return tx.query(sql, params);
     }
 
+    /**
+     * @return {ShrimpleSql}
+     */
     get insertIntoSql() {
         throw new Error(`'insertIntoSql' must be overridden in child class.`);
     }
 
-    get insertRowSql() {
-        throw new Error(`'insertRowSql' must be overridden in child class.`);
-    }
-
+    /**
+     * @return {ShrimpleSql}
+     */
     mapToTable(model) {
         throw new Error(`'mapToTable' must be overridden in child class.`);
     }
@@ -37,40 +43,40 @@ export class SqlRepository {
     async add(...models) {
         if (models.length === 0) return;
 
-        const insertRowSql = this.insertRowSql;
-
         for (let chunk of chunked(models)) {
-            const sqlb = new Sqlb(this.insertIntoSql + " values");
+            const shrimple = this.insertIntoSql.clone();
 
-            for (let i = 0; i < chunk.length; i++) {
-                sqlb.add(insertRowSql, this.mapToTable(chunk[i]));
-                if (!isLastIndex(i, chunk)) {
-                    sqlb.add(",");
-                }
-            }
+            const valuesList = chunk.map(x => this.mapToTable(x));
+            shrimple.appendMany(valuesList, ',', 'values');
 
-            await this.execute(sqlb);
+            await this.execute(shrimple);
         }
     }
 
+    /**
+     * @return {ShrimpleSql}
+     */
     buildSelectFromFilter(filter){
         throw new Error(`'buildSelectFromFilter' must be overridden in child class.`);
     }
 
+    /**
+     * @return {ShrimpleSql}
+     */
     mapFromTable(row) {
         throw new Error(`'mapFromTable' must be overridden in child class.`);
     }
 
     async first(filter){
-        const sqlb = this.buildSelectFromFilter(filter);
-        sqlb.add(`limit 1`);
-        const result = await this.execute(sqlb);
+        const shrimple = this.buildSelectFromFilter(filter);
+        shrimple.append`limit 1`;
+        const result = await this.execute(shrimple);
         return result.rows.map(this.mapFromTable)[0] ?? null;
     }
 
     async list(filter) {
-        const sqlb = this.buildSelectFromFilter(filter);
-        const result = await this.execute(sqlb);
+        const shrimple = this.buildSelectFromFilter(filter);
+        const result = await this.execute(shrimple);
         return result.rows.map(this.mapFromTable);
     }
 
@@ -79,8 +85,8 @@ export class SqlRepository {
     }
 
     async remove(filter) {
-        const sqlb = this.buildDeleteFromFilter(filter);
-        const result = await this.execute(sqlb);
+        const shrimple = this.buildDeleteFromFilter(filter);
+        const result = await this.execute(shrimple);
         return result.rowCount;
     }
 }

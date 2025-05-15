@@ -1,5 +1,5 @@
 import {SqlRepository} from "./_sqlRepository.js";
-import {Sqlb} from "./_sqlb.js";
+import {sql} from "./_shrimple.js";
 
 export class InviteFilter {
     whereServer(serverId){
@@ -15,28 +15,19 @@ export class InviteFilter {
 
 export class InviteRepository extends SqlRepository {
     get insertIntoSql() {
-        return `insert into invites (id, server_id, invited_by_id, valid_until)`;
-    }
-
-    get insertRowSql() {
-        return `($id, $serverId, $invitedById, $validUntil)`;
+        return sql`insert into invites (id, server_id, invited_by_id, valid_until)`;
     }
 
     mapToTable(model) {
-        return {
-            id: model.id,
-            serverId: model.serverId,
-            invitedById: model.invitedById,
-            validUntil: model.validUntil,
-        };
+        return sql`(${model.id}, ${model.serverId}, ${model.invitedById}, ${model.validUntil})`;
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`select * from invites`), filter);
+        return this.sqlWithWhereClause(sql`select * from invites`, filter);
     }
 
     mapFromTable(row) {
-        return{
+        return {
             id: row.id,
             serverId: row.server_id,
             invitedById: row.invited_by_id,
@@ -45,20 +36,22 @@ export class InviteRepository extends SqlRepository {
     }
 
     buildDeleteFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`delete from invites`), filter);
+        return this.sqlWithWhereClause(sql`delete from invites`, filter);
     }
 
-    sqlWithWhereClause(sqlb, filter) {
-        sqlb.add(`where true`);
+    sqlWithWhereClause(shrimple, filter) {
+        const clauses = [];
 
         if (filter.filterServer !== undefined){
-            sqlb.add(`and server_id = $serverId`, {serverId: filter.filterServer})
+            clauses.push(sql`server_id = ${filter.filterServer}`);
         }
 
         if(filter.filterId !== undefined) {
-            sqlb.add(`and id = $id`, {id: filter.filterId});
+            clauses.push(sql`id = ${filter.filterId}`);
         }
 
-        return sqlb;
+        shrimple.appendMany(clauses, 'and', 'where');
+
+        return shrimple;
     }
 }
