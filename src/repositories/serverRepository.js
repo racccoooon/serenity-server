@@ -1,5 +1,5 @@
 import {SqlRepository} from "./_sqlRepository.js";
-import {Sqlb} from "./_sqlb.js";
+import {sql} from "./_shrimple.js";
 
 export class ServerFilter{
     whereIsMember(userId){
@@ -10,34 +10,27 @@ export class ServerFilter{
 
 export class ServerRepository extends SqlRepository {
     get insertIntoSql() {
-        return 'insert into servers (id, owner_id, name, description)';
-    }
-
-    get insertRowSql() {
-        return '($id, $ownerId, $name, $description)';
+        return sql`insert into servers (id, owner_id, name, description)`;
     }
 
     mapToTable(model) {
-        return {
-            id: model.id,
-            ownerId: model.ownerId,
-            name: model.name,
-            description: model.description,
-        };
+        return sql`(${model.id}, ${model.ownerId}, ${model.name}, ${model.description})`;
     }
 
-    sqlWithWhereClause(sqlb, filter) {
-        sqlb.add('where true');
+    sqlWithWhereClause(shrimple, filter) {
+        const clauses = [];
 
         if (filter.filterIsMember !== undefined) {
-            sqlb.add(`and exists (select true from server_members where server_id = servers.id and user_id = $userId)`, {userId: filter.filterIsMember});
+            clauses.push(sql`exists (select true from server_members where server_id = servers.id and user_id = ${filter.filterIsMember})`);
         }
 
-        return sqlb;
+        shrimple.appendMany(clauses, 'and', 'where');
+
+        return shrimple;
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb('select * from servers'), filter);
+        return this.sqlWithWhereClause(sql`select * from servers`, filter);
     }
 
     mapFromTable(row) {
@@ -50,6 +43,6 @@ export class ServerRepository extends SqlRepository {
     }
 
     buildDeleteFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb(`delete from servers`), filter);
+        return this.sqlWithWhereClause(sql`delete from servers`, filter);
     }
 }
