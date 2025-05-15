@@ -19,28 +19,28 @@ Content-Type: application/json
 }
 
 ### delete a channel group on a server
-DELETE localhost:5680/api/v1/servers/ba9ca2fa-2b86-4c2a-97c0-751c1ed8dd0f/channel-groups/d5258cc0-7997-4ddb-8ee5-cdb5e35efd53
+DELETE localhost:5680/api/v1/servers/5662630e-7926-4c66-84a5-73d8488c8c15/channel-groups/d5258cc0-7997-4ddb-8ee5-cdb5e35efd53
 Accept: application/json
 Authorization: {{bearer_token}}
 
 ### get channel groups in server
-GET localhost:5680/api/v1/servers/d9bb12bc-c9d1-4391-906c-829d6682f6dc/channel-groups
+GET localhost:5680/api/v1/servers/5662630e-7926-4c66-84a5-73d8488c8c15/channel-groups
 Accept: application/json
 Authorization: {{bearer_token}}
 
 
 ### create a channel in the default group (none)
-POST localhost:5680/api/v1/servers/ba9ca2fa-2b86-4c2a-97c0-751c1ed8dd0f/channels
+POST localhost:5680/api/v1/servers/5662630e-7926-4c66-84a5-73d8488c8c15/channels
 Accept: application/json
 Authorization: {{bearer_token}}
 Content-Type: application/json
 
 {
   "name": "foo",
-  "groupId": "d5258cc0-7997-4ddb-8ee5-cdb5e35efd53"
+  "groupId": "2cf1953d-bccd-4878-8934-fa22dd834169"
 }
 
 ### get channels in server
-GET localhost:5680/api/v1/servers/ac7d38cd-3ba5-4e6b-9f79-31005f530c47/channels
+GET localhost:5680/api/v1/servers/5662630e-7926-4c66-84a5-73d8488c8c15/channels
 Accept: application/json
 Authorization: {{bearer_token}}
