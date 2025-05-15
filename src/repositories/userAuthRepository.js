@@ -1,6 +1,5 @@
-import {logger} from "../utils/logger.js";
-import {Sqlb} from "./_sqlb.js";
 import {SqlRepository} from "./_sqlRepository.js";
+import {sql} from "./_shrimple.js";
 
 export class UserAuthFilter {
     whereUserId(userId) {
@@ -16,38 +15,31 @@ export class UserAuthFilter {
 
 export class UserAuthRepository extends SqlRepository {
     get insertIntoSql() {
-        return 'insert into user_auth (id, user_id, type, details)';
-    }
-
-    get insertRowSql() {
-        return '($id, $userId, $type, $details)';
+        return sql`insert into user_auth (id, user_id, type, details)`;
     }
 
     mapToTable(model) {
-        return {
-            id: model.id,
-            userId: model.userId,
-            type: model.type,
-            details: model.details,
-        };
+        return sql`(${model.id}, ${model.userId}, ${model.type}, ${model.details})`;
     }
 
     buildSelectFromFilter(filter) {
-        return this.sqlWithWhereClause(new Sqlb('select * from user_auth'), filter);
+        return this.sqlWithWhereClause(sql`select * from user_auth`, filter);
     }
 
-    sqlWithWhereClause(sqlb, filter){
-        sqlb.add('where true');
+    sqlWithWhereClause(shrimple, filter){
+        const clauses = [];
 
         if (filter.filterUserId !== undefined) {
-            sqlb.add('and user_id = $userId', {userId: filter.filterUserId});
+            clauses.push(sql`user_id = ${filter.filterUserId}`);
         }
 
         if (filter.filterType !== undefined) {
-            sqlb.add('and type = $type', {type: filter.filterType});
+            clauses.push(sql`type = ${filter.filterType}`);
         }
 
-        return sqlb;
+        shrimple.appendMany(clauses, 'and', 'where');
+
+        return shrimple;
     }
 
     mapFromTable(row) {
