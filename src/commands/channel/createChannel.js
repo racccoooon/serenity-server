@@ -1,6 +1,8 @@
 import {v4} from "uuid";
 import {LexoRank} from "lexorank";
 import {ChannelGroupFilter} from "../../repositories/channelGroupRepository.js";
+import {HttpError} from "../../errors/httpError.js";
+import {HttpStatusCode} from "axios";
 
 export class CreateChannelCommand {
     constructor(serverId, groupId, name) {
@@ -19,8 +21,8 @@ export class CreateChannelHandler {
     async handle(command) {
         const group = await this.channelGroupRepository.first(new ChannelGroupFilter()
             .whereId(command.groupId));
-        if(group.serverId !== command.serverId){
-            throw new Error('Group not on server');
+        if(group === null || group.serverId !== command.serverId){
+            throw new HttpError(HttpStatusCode.NotFound, 'unknown channel group');
         }
 
         const biggestRank = await this.channelRepository.getBiggestRank(command.groupId);
