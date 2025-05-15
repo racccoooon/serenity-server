@@ -29,6 +29,7 @@ export function createMessage(fastify){
 
         const invite = await request.scope.resolve(Mediator)
             .send(new CreateMessageCommand(
+                request.params.serverId,
                 request.params.channelId,
                 entity.id,
                 requestDto.type,

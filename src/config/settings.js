@@ -13,6 +13,10 @@ export const config = {
         port: process.env.POSTGRES_PORT ? Number(process.env.POSTGRES_PORT) : 7891,
         database: process.env.POSTGRES_DB || 'serenity'
     },
+    redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 7892,
+    },
     logLevel: process.env.LOG_LEVEL || 'info',
     logPii: process.env.LOG_PII || true,
     environment: process.env.ENVIRONMENT || 'Development',

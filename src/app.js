@@ -40,6 +40,8 @@ import {MessageRepository} from "./repositories/messageRepository.js";
 import {UpdateChannelGroupCommand, UpdateChannelGroupHandler} from "./commands/channelGroup/updateChannelGroup.js";
 import {JoinServerCommand, JoinServerHandler} from "./commands/invite/joinServer.js";
 import {DeleteChannelGroupCommand, DeleteChannelGroupHandler} from "./commands/channelGroup/deleteChannelGroup.js";
+import {EventService, InMemoryEventStrategy} from "./eventing/index.js";
+import {MessageCreatedEvent} from "./eventing/events/messages/created/messageCreated.js";
 
 const fastify = Fastify({logger: false});
 // fall-back content type handler
@@ -74,6 +76,7 @@ container.registerTransient(ChannelRepository, (c) => new ChannelRepository(c.re
 container.registerTransient(MessageRepository, (c) => new MessageRepository(c.resolve(DbTransaction)));
 
 // commands and queries
+
 container.registerTransient(RegisterUserHandler, (c) => new RegisterUserHandler(
     c.resolve(UserRepository),
     c.resolve(UserAuthRepository),
@@ -123,6 +126,7 @@ container.registerTransient(GetChannelsInServerHandler, (c) => new GetChannelsIn
 
 container.registerTransient(CreateMessageHandler, (c) => new CreateMessageHandler(
     c.resolve(MessageRepository),
+    c.resolve(EventService),
 ));
 
 container.registerTransient(GetPublicUserProfileHandler, (c) => new GetPublicUserProfileHandler(
@@ -140,9 +144,21 @@ container.registerTransient(JoinServerHandler, (c) => new JoinServerHandler(
     c.resolve(ServerMemberRepository),
 ));
 
+// messaging
+const eventService = new EventService(new InMemoryEventStrategy()); //TODO: switch based on config
+
+eventService.on(MessageCreatedEvent, {
+    handle: e => {
+        console.log("received event: ", e);
+    }
+});
+
+container.registerSingleton(EventService, eventService);
+
+// mediator
 const mediatorBuilder = new MediatorBuilder();
 
-mediatorBuilder.register(RegisterUserCommand, (c) =>  c.resolve(RegisterUserHandler));
+mediatorBuilder.register(RegisterUserCommand, (c) => c.resolve(RegisterUserHandler));
 mediatorBuilder.register(PasswordLoginCommand, (c) => c.resolve(PasswordLoginHandler));
 mediatorBuilder.register(LogoutCommand, (c) => c.resolve(LogoutHandler));
 mediatorBuilder.register(CreatePublicTokenCommand, (c) => c.resolve(CreatePublicTokenHandler));

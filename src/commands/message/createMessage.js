@@ -1,7 +1,9 @@
 import {v4} from "uuid";
+import {MessageCreatedEvent} from "../../eventing/events/messages/created/messageCreated.js";
 
 export class CreateMessageCommand {
-    constructor(channelId, userId, type, details) {
+    constructor(serverId, channelId, userId, type, details) {
+        this.serverId = serverId,
         this.channelId = channelId;
         this.userId = userId;
         this.type = type;
@@ -10,8 +12,9 @@ export class CreateMessageCommand {
 }
 
 export class CreateMessageHandler{
-    constructor(messageRepository) {
+    constructor(messageRepository, eventService) {
         this.messageRepository = messageRepository;
+        this.eventService = eventService;
     }
 
     async handle(command) {
@@ -24,6 +27,11 @@ export class CreateMessageHandler{
         };
 
         await this.messageRepository.add(message);
+
+        await this.eventService.publish(new MessageCreatedEvent({
+            serverId: command.serverId,
+            message: message,
+        }));
 
         return message;
     }
