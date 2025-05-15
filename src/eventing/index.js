@@ -36,7 +36,7 @@ export class InMemoryEventStrategy {
     }
 
     async publish(name, payload) {
-        this.callback(name, payload);
+        process.nextTick(() => this.callback(name, payload));
     }
 }
 
